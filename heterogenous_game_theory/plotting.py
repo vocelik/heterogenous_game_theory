@@ -576,7 +576,7 @@ def fourier_instability(dataframe, n_peaks):
 
     return df_fin
 
-def save_cooperate_csv(tournament, type_of_tournament = None, seed = None, type_of_file = ".csv"):
+def save_tournament_csv(tournament, type_of_tournament = None, seed = None, type_of_file = ".csv"):
     
     """
     Takes the tournament object as input and saves

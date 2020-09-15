@@ -2,7 +2,6 @@ import sys
 import networkx as nx
 import numpy as np
 import time
-
 from .strategies import cooperate, defect, tit_for_tat, generous_tit_for_tat, win_stay_lose_shift, APavlov, tit_for_two_tats
 from .initialize_agents import *
 from itertools import combinations, cycle
@@ -45,7 +44,7 @@ class Tournament:
         self.fitness_results = np.zeros((len(self.agents()), max_rounds))
         self.evolution = [] # Todo: add evolution
         self.strategy_evolution = []
-        
+        self.winning_strategies = []
         # state variables
         self.round = 0
         self.is_done = False
@@ -306,6 +305,7 @@ class Tournament:
         return Δfitness_1, Δfitness_2, outcome
         
     def play(self, self_reward, playing_each_other, nr_strategy_changes, mutation_rate):
+
         """
         parameters:
             - self_reward: function or None, None indicates agents do not get 
@@ -331,11 +331,11 @@ class Tournament:
         strategies_initialized = self.check_strategies_initialized()
 
         if not strategies_initialized:
-
             print(f'All agents mus have initialized strategies, this can be done using the init_strategies method')
-
             return False
 
+
+        # Start the tournament
         start_time = time.time()
         spinner = cycle(['-', '/', '|', '\\'])
 
@@ -344,17 +344,14 @@ class Tournament:
         for i in range(self.max_rounds):
             
             self.round += 1
-
             sys.stdout.write(next(spinner))   # write the next character
             
             if self_reward:
-
                 # agents get fitness from their own internal market
                 for agent in self.agents():
                     agent.fitness += self_reward(agent)
             
-            if playing_each_other:
-                
+            if playing_each_other: 
                 # this can be switched to False to create a control-simulation for comparison
                 for agent_1, agent_2, data in self.graph.edges(data=True): # data: include edge-attributes in the iteration
                     # todo: we are looping though edges twice.. this could be done only once.
@@ -363,6 +360,7 @@ class Tournament:
             for _ in range(nr_strategy_changes):
                 # change {nr_strategy_changes} strategies
                 losing_agent, winning_strategy = self.change_a_strategy(mutation_rate, self.round)
+                self.winning_strategies.append(winning_strategy)
                 
             # update fitness_histories
             for agent in self.agents():
@@ -373,7 +371,6 @@ class Tournament:
                 break
 
             self.agents_per_strategy_history()
-
             sys.stdout.flush()                # flush stdout buffer (actual character display)
             sys.stdout.write('\b')            # erase the last written char
 
@@ -448,6 +445,4 @@ class Tournament:
         
         tournament.play(self_reward, playing_each_other, nr_strategy_changes, mutation_rate)
         
-        return tournament
-        
-    
+        return tournament    

@@ -7,7 +7,7 @@ from itertools import combinations
 import matplotlib.pyplot as plt
 
 def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
-    return truncnorm(s
+    return truncnorm(
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 def get_agents(homogenous = True, power = False, number_of_agents = 100, M = [], E = [], I = []):
@@ -78,7 +78,7 @@ def get_agents(homogenous = True, power = False, number_of_agents = 100, M = [],
 
     return agents
 
-def check_parameters(agents, M, E, I):
+def check_parameters(agents):
     
     sdm = round(np.std([agent.m for agent in agents]))
     sdi =round(np.std([agent.i for agent in agents]),2)
@@ -126,7 +126,7 @@ def compare_payoff_function(agents, payoff_functions):
         """            
         # loop through all combinations of countries in the tournament.
         # the index of country 1 (c1) is always less than that of country 2 (c2)
-        for c1, c2 in combinations(agents, 2):
+        for c1, c2 in combinations(agents[0:5], 2):
             # calculate the payoff values that are associated with games 
             # between these two countries, and store them as tupples
             # R: reward, P: punishment, T: temptation, S: sucker
