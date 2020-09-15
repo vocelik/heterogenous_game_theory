@@ -34,23 +34,23 @@ def get_payoff_dataframe(population, payoff_functions, distance_function, outcom
     graph = Tournament.init_graph(population, distance_function, payoff_functions)
     names = [c.name for c in list(graph.nodes)]
     df = pd.DataFrame([], columns=names)
-    for this_country in population:
-        country_dict = {}
-        for other_country in population:
-            if this_country == other_country: continue
+    for this_agent in population:
+        agent_dict = {}
+        for other_agent in population:
+            if this_agent == other_agent: continue
 
-            dat = get_game_data(graph, this_country, other_country, outcome)
+            dat = get_game_data(graph, this_agent, other_agent, outcome)
 
-            country_dict[other_country.name] = dat
+            agent_dict[other_agent.name] = dat
            
-        country_dict['Receiving_Country'] = this_country.name
+        agent_dict['Receiving_agent'] = this_agent.name
     
-        df = df.append(country_dict, ignore_index=True)
-    df = df.set_index('Receiving_Country')
+        df = df.append(agent_dict, ignore_index=True)
+    df = df.set_index('Receiving_agent')
 
     return df
 
-def get_country_df(tournament, add_outcomes=True):
+def get_agent_df(tournament, add_outcomes=True):
     df = pd.DataFrame([[c.name, c.m, c.e, c.i, c.sqrt_area] for c in list(tournament.graph.nodes)], columns=['name', 'm', 'e', 'i', 'sqrt_area']).set_index('name')
     if add_outcomes:
         outcomes = get_outcomes(tournament, df)
@@ -62,9 +62,9 @@ def get_country_df(tournament, add_outcomes=True):
 def get_outcomes(tournament, df):
     acc_dict = {}
     
-    for country in tournament.graph.nodes:
-        games_1 = list(tournament.graph.out_edges(country, data=True))
-        games_2 = list(tournament.graph.in_edges(country, data=True))
+    for agent in tournament.graph.nodes:
+        games_1 = list(tournament.graph.out_edges(agent, data=True))
+        games_2 = list(tournament.graph.in_edges(agent, data=True))
         
         #assert len(games_1)+len(games_2) == len(tournament.graph.nodes) -1
         outcome_dict = {(C,C): 'R', (C,D):'S', (D,C): 'T', (D,D): 'P'}
@@ -72,19 +72,19 @@ def get_outcomes(tournament, df):
         
         for game in games_1:
             c1, c2, data = game
-            assert c1 == country
+            assert c1 == agent
             zips = list(zip(data['history_1'], data['history_2']))
             for actions in zips:
                 outcome_acc[outcome_dict[actions]] += 1
         for game in games_2:
             c2, c1, data = game
-            assert c1 == country
+            assert c1 == agent
             zips = list(zip(data['history_2'], data['history_1']))
             for actions in zips:
                 outcome_acc[outcome_dict[actions]] += 1 
                 
         #print(sum(outcome_acc.values()))
-        acc_dict[country.name] = outcome_acc
+        acc_dict[agent.name] = outcome_acc
     #print(acc_dict)
     return acc_dict    
             
@@ -93,7 +93,7 @@ def get_game_history(tournament, c1, c2):
     get the history of a game betweet c1 and c2
     
     parameters:
-        - c1, c2: Country, countries in question
+        - c1, c2: agent, agents in question
         
     returns:
         - list of tupples, where the [0]th elements are moves by c1, and the [1]th elements are moves by c2
@@ -104,13 +104,13 @@ def get_game_history(tournament, c1, c2):
          (<Action.C: 1>, <Action.D: 0>),
          (<Action.D: 0>, <Action.D: 0>)]
     """
-    # quick fix to be able to get the right countries by using their names as strings
+    # quick fix to be able to get the right agents by using their names as strings
     if isinstance(c1, str):
-        c1 = [c for c in tournament.countries() if c.name==c1][0]
+        c1 = [c for c in tournament.agents() if c.name==c1][0]
     if isinstance(c2, str):
-        c2 = [c for c in tournament.countries() if c.name==c2][0]
+        c2 = [c for c in tournament.agents() if c.name==c2][0]
         
-    # Todo: if the name of a country is not in the list of names, then the code above error without clear message
+    # Todo: if the name of a agent is not in the list of names, then the code above error without clear message
     data = tournament.graph.get_edge_data(c1, c2)
     if data is None:
         # order of c1 and c2 what wrong in the digraph
@@ -122,9 +122,9 @@ def get_game_history(tournament, c1, c2):
 def outcomes_dict_per_round(tournament):
     array_dict= {'Mutual_Cooperation': np.zeros((tournament.round,)), 'Mutual_Defection': np.zeros((tournament.round,)), 'Exploitation': np.zeros((tournament.round,))}
 
-    for country_1, country_2 in tournament.graph.edges(data=False):     
+    for agent_1, agent_2 in tournament.graph.edges(data=False):     
         
-        for round_num, (action_1, action_2) in enumerate(get_game_history(tournament, country_1, country_2)):
+        for round_num, (action_1, action_2) in enumerate(get_game_history(tournament, agent_1, agent_2)):
             if action_1 == action_2:
                 outcome = 'Mutual_Cooperation' if action_1 == C else 'Mutual_Defection'
                 array_dict[outcome][round_num] += 1
@@ -142,8 +142,8 @@ def C_D_dict_per_round(tournament):
     """
     array_dict= {C: np.zeros((tournament.round,)), D: np.zeros((tournament.round,))}
     
-    for country_1, country_2, data in tournament.graph.edges(data=True):
-        for round_num, (action_1, action_2) in enumerate(get_game_history(tournament, country_1, country_2)):
+    for agent_1, agent_2, data in tournament.graph.edges(data=True):
+        for round_num, (action_1, action_2) in enumerate(get_game_history(tournament, agent_1, agent_2)):
             array_dict[action_1][round_num] += 1
             array_dict[action_2][round_num] += 1
     
@@ -174,7 +174,7 @@ def overal_outcomes(tournament):
 def overal_C_and_D(tournament):
     """
     returns:
-        - tuple where the [0]th resp. [1]th element is the number of times any country cooperated resp. defected.
+        - tuple where the [0]th resp. [1]th element is the number of times any agent cooperated resp. defected.
     """
     array_dict = C_D_dict_per_round(tournament)
     number_of_C = sum(array_dict[C])
@@ -275,16 +275,16 @@ def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size = 40, y_size = 
     cmap = plt.get_cmap(cmap)
     colors = [cmap(value/(n_strategies-1)) for value in range(n_strategies)]
     
-    for country in tournament.countries():
-        for i, (n, strat) in enumerate(country._evolution[:-1]):
+    for agent in tournament.agents():
+        for i, (n, strat) in enumerate(agent._evolution[:-1]):
 
             row = tournament.strategy_list.index(strat)
-            next_n = country._evolution[i+1][0]
-            matrix[row, n:next_n] += country.m
+            next_n = agent._evolution[i+1][0]
+            matrix[row, n:next_n] += agent.m
         
-        last_evo, last_strategy = country._evolution[-1]
+        last_evo, last_strategy = agent._evolution[-1]
         row = tournament.strategy_list.index(last_strategy)
-        matrix[row, last_evo:] += country.m
+        matrix[row, last_evo:] += agent.m
     
     fig, ax = plt.subplots(figsize =(x_size, y_size,))
     ax.stackplot(range(rounds+1), *matrix, labels=[s.name for s in tournament.strategy_list], colors= colors) #this needs to be adjusted for the number of strategies
@@ -293,41 +293,41 @@ def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size = 40, y_size = 
     plt.xlabel('Round number', fontsize=36)
     plt.tick_params(axis='both',labelsize=24)
 
-def draw_country_line(country, cmap, strategy_list): #need to add a color legend and color line option
+def draw_agent_line(agent, cmap, strategy_list): #need to add a color legend and color line option
 
     colors = [cmap(value/(len(strategy_list)-1)) for value in range(len(strategy_list))]
 
     colorDict = dict(zip(strategy_list, colors))
 
-    le = len(country._evolution)
+    le = len(agent._evolution)
 
     for evo_nr in range(le-1):
-        Xstart = country._evolution[evo_nr][0]
-        Xend = country._evolution[evo_nr+1][0] +1
-        newColor = colorDict[country._evolution[evo_nr][1]]
-        plt.plot(range(Xstart, Xend), country.fitness_history[Xstart: Xend], color = newColor)
+        Xstart = agent._evolution[evo_nr][0]
+        Xend = agent._evolution[evo_nr+1][0] +1
+        newColor = colorDict[agent._evolution[evo_nr][1]]
+        plt.plot(range(Xstart, Xend), agent.fitness_history[Xstart: Xend], color = newColor)
 
-    Xstart = country._evolution[-1][0]
-    Xend = len(country.fitness_history)
-    lastColor = colorDict[country._evolution[-1][1]]
-    plt.plot(range(Xstart, Xend), country.fitness_history[Xstart:], color = lastColor)
+    Xstart = agent._evolution[-1][0]
+    Xend = len(agent.fitness_history)
+    lastColor = colorDict[agent._evolution[-1][1]]
+    plt.plot(range(Xstart, Xend), agent.fitness_history[Xstart:], color = lastColor)
 
-def draw_country_line_delta(country, cmap, strategy_list):
-    fitness_history = country.fitness_history
+def draw_agent_line_delta(agent, cmap, strategy_list):
+    fitness_history = agent.fitness_history
     fitnessDeltas =[0]
     for i in range(len(fitness_history)-1):
         fitnessDeltas.append(fitness_history[i+1] - fitness_history[i])
     plt.plot(fitnessDeltas)
 
-def wholePopulation_fitnessList(countries, delta = False):
+def wholePopulation_fitnessList(agents, delta = False):
     def calculate_entire_fitness(roundNumber): #Give entire fitness in the population at roundNumber
         result = 0
-        for country in countries:
-            result += country.fitness_history[roundNumber]
+        for agent in agents:
+            result += agent.fitness_history[roundNumber]
         return result
 
     listOfFitnesses = []
-    for round in range(len(countries[0].fitness_history)):
+    for round in range(len(agents[0].fitness_history)):
         listOfFitnesses.append(calculate_entire_fitness(round))
 
     if delta == False:
@@ -341,23 +341,23 @@ def draw_fitness_graph(tournament, selecting=[], filtering = [], cmap = 'Greys_r
     cmap = plt.get_cmap(cmap)
 
     if selecting:
-        countries=selecting
+        agents=selecting
     elif filtering:
-        countries = [country for country in tournament.countries if not country in filtering]
+        agents = [agent for agent in tournament.agents if not agent in filtering]
     else:
-        countries = list(tournament.countries())
+        agents = list(tournament.agents())
 
 
     if delta == False and wholePopulation == False:
-        for country in countries:
-            draw_country_line(country, cmap, tournament.strategy_list)
-            plt.annotate(country.name, xy=(len(country.fitness_history) - 0.5, country.fitness_history[-1]))
+        for agent in agents:
+            draw_agent_line(agent, cmap, tournament.strategy_list)
+            plt.annotate(agent.name, xy=(len(agent.fitness_history) - 0.5, agent.fitness_history[-1]))
     elif delta == True and wholePopulation == False:
-        for country in countries:
-            draw_country_line_delta(country, cmap, tournament.strategy_list)
-            plt.annotate(country.name, xy=(len(country.fitness_history) - 0.5, (country.fitness_history[-1] - country.fitness_history[-2])))
+        for agent in agents:
+            draw_agent_line_delta(agent, cmap, tournament.strategy_list)
+            plt.annotate(agent.name, xy=(len(agent.fitness_history) - 0.5, (agent.fitness_history[-1] - agent.fitness_history[-2])))
     elif wholePopulation == True:
-        plt.plot(wholePopulation_fitnessList(countries, delta = delta),c='black',linewidth=1)
+        plt.plot(wholePopulation_fitnessList(agents, delta = delta),c='black',linewidth=1)
         plt.xlabel("Round Number", fontsize = 24)
         plt.ylabel("Fitness Level", fontsize = 24)
         plt.tick_params(axis='both',labelsize=14)
@@ -368,13 +368,13 @@ def fitness_history_sum_list(tournament, selecting=[], filtering = []):
     return the fitness of all contries summed, in a list of rounds.
     """
     if selecting:
-        countries=selecting
+        agents=selecting
     elif filtering:
-        countries = [country for country in tournament.countries if not country in filtering]
+        agents = [agent for agent in tournament.agents if not agent in filtering]
     else:
-        countries = list(tournament.countries())
+        agents = list(tournament.agents())
 
-    fitness_histories = [c.fitness_history for c in countries]
+    fitness_histories = [c.fitness_history for c in agents]
     ls = [sum(fitnesses) for fitnesses in zip(*fitness_histories)]
     
     return ls
@@ -600,35 +600,35 @@ def save_cooperate_csv(tournament, type_of_tournament = None, seed = None, type_
     
 def get_rewards(population, payoff_functions, distance_function):
     """
-    calculate the payoffs of every country with every other country when both of them cooperate.
+    calculate the payoffs of every agent with every other agent when both of them cooperate.
     """
     return get_payoff_dataframe(population,  payoff_functions, distance_function, 'R')
 
 def get_temptations(population, payoff_functions, distance_function):
     """
-    calculate the payoffs of every country with every other country when itself defects and  the others cooperate.
+    calculate the payoffs of every agent with every other agent when itself defects and  the others cooperate.
     """
     return get_payoff_dataframe(population,  payoff_functions, distance_function, 'T')
 
 def get_punishments(population, payoff_functions, distance_function):
     """
-    calculate the payoffs of every country with every other country when both of them defect.
+    calculate the payoffs of every agent with every other agent when both of them defect.
     """
     return get_payoff_dataframe(population,  payoff_functions, distance_function, 'P')
     
 def get_suckers(population, payoff_functions, distance_function):
     """
-    calculate the payoffs of every country with every other country when itself cooperates and the others defect.
+    calculate the payoffs of every agent with every other agent when itself cooperates and the others defect.
     """
     return get_payoff_dataframe(population,  payoff_functions, distance_function, 'S')
     
 def get_self_reward(population, payoff_functions, distance_function):
     """
-    calculate fitness, which every country gets from its own market.
+    calculate fitness, which every agent gets from its own market.
     """
-    for country in population:
-        country.d = distance_function(country.sqrt_area)
-    self_reward_dict = {country: payoff_functions['self_reward'](country) for country in population}
+    for agent in population:
+        agent.d = distance_function(agent.sqrt_area)
+    self_reward_dict = {agent: payoff_functions['self_reward'](agent) for agent in population}
     return pd.DataFrame.from_dict(self_reward_dict)
 
 def get_mean_rewards(population, payoff_functions, distance_function):
@@ -690,16 +690,16 @@ def get_sd_suckers(population, payoff_functions, distance_function):
     return df.std()
     
 def get_mean_self_rewards(population, payoff_functions, distance_function):  
-    for country in population:
-        country.d = distance_function(country.sqrt_area)
+    for agent in population:
+        agent.d = distance_function(agent.sqrt_area)
     
-    return mean([payoff_functions['self_reward'](country) for country in population])
+    return mean([payoff_functions['self_reward'](agent) for agent in population])
     
 def get_sd_self_rewards(population, payoff_functions, distance_function):
-    for country in population:
-        country.d = distance_function(country.sqrt_area)    
+    for agent in population:
+        agent.d = distance_function(agent.sqrt_area)    
     
-    return stdev([payoff_functions['self_reward'](country) for country in population])
+    return stdev([payoff_functions['self_reward'](agent) for agent in population])
 
 
 
