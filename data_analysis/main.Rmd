@@ -38,35 +38,69 @@ library(kableExtra)
 theme_set(theme_classic())
 ```
 
+Outliers
 ```{r}
-df_outliers_control_group <- do.call(rbind, lapply(Sys.glob("../Control Group/Data/outliers/*.csv"), read_csv)) # make sure no other .csv files in target.
-df_outliers_control_group
+df_outliers_control_group <- do.call(rbind, lapply(Sys.glob("../Control Group/Data/outliers/*.csv"), read_csv)) %>% 
+  mutate(tournament = "control group")
+
+df_outliers_complete_heterogeneity <- do.call(rbind, lapply(Sys.glob("../Complete Heterogeneity/Data/outliers/*.csv"), read_csv)) %>%
+  mutate(tournament = "complete heterogeneity")
 ```
 
-```{r}
-df_control_group <- do.call(cbind, lapply(Sys.glob("../Control Group/Data/*.csv"), read_csv)) # make sure no other .csv files in target.
-df_control_group
-```
+Combine outliers
 
 ```{r}
-df_outliers_control_group %>%
-    group_by(S.D.) %>%
-    summarise(average_outlier_count = floor(mean(Counts))) %>%
-    mutate(tournament = "control group") %>%
-    kable() %>%
-    kable_styling("striped",full_width = F)
+outliers <- df_outliers_complete_heterogeneity %>%
+  rbind(df_outliers_control_group)
+```
+
+Cooperation rates
+
+```{r}
+df_control_group <- do.call(cbind, lapply(Sys.glob("../Control Group/Data/*.csv"), read_csv)) %>%
+  janitor::clean_names() %>%
+  mutate(tournament = "control group",
+         round = row_number()) %>%
+  pivot_longer(seed_1024:seed_8, names_to = "Seed") 
+
+df_complete_heterogeneity <- do.call(cbind, lapply(Sys.glob("../Complete Heterogeneity/Data/*.csv"), read_csv)) %>%
+  janitor::clean_names() %>%
+  mutate(tournament = "complete heterogeneity",
+         round = row_number()) %>%
+  pivot_longer(seed_1024:seed_8, names_to = "Seed")
+```
+
+Combine cooperation rates
+```{r}
+coop_rates <- df_control_group %>%
+  rbind(df_complete_heterogeneity)
+```
+
+---
+
+```{r}
+coop_rates %>%
+  mutate(seed = as.factor(Seed)) %>%
+  ggplot() +
+  geom_smooth(aes(round, value, color = seed), se = F) +
+  facet_wrap(~tournament) +
+  labs(title = "Average cooperation ratio per seed per tournament type.",
+       x = "coop ratio",
+       y = "round") 
 ```
 
 
 ```{r}
-df_control_group %>%
-    mutate(n = row_number()) %>%
-    pivot_longer(`Seed 1024`:`Seed 8`,names_to = "Seed", values_to = "level_of_cooperation") %>%
-    mutate(seed = as.factor(Seed)) %>%
-    ggplot(aes(n, level_of_cooperation, color = Seed)) +
-    geom_smooth(se = F) 
+outliers %>%
+  mutate(seed = as.factor(Seed)) %>%
+  ggplot() +
+  geom_point(aes(S.D., Counts, color = seed)) +
+  geom_smooth(aes(S.D., Counts), color = "black") +
+  facet_wrap(~tournament) +
+  labs(title = "The instability of the average rage of cooperation.",
+       x = "s.d.",
+       y = "deviation from average") 
 ```
-
 
 
 
