@@ -8,9 +8,9 @@ This package is based on the [UvAAxelrod](https://github.com/RickGroeneweg/UvAAx
 
 For any agent pair _x_,_y_ the payoffs are calculated as follows:
 
-$$ R  = (x_e - x_i * y_e) * y_m$$
-$$ T  = x_e * y_m$$
-$$ S  = -x_i * y_e * y_m$$
+$$ R  = (x_{e} - x_{i} * y_{e}) * y_m$$
+$$ T  = x_{e} * y_{m}$$
+$$ S  = -x_{i} * y_{e} * y_{m}$$
 $$ P  = 0$$
 
 For all but the most extreme values of _M_, _e_, and _i_. This satisfies the condition for the prisoner's dilemma:
