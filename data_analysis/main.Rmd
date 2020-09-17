@@ -84,12 +84,43 @@ Combine cooperation rates
 ```{r}
 coop_rates <- df_control_group %>%
   rbind(df_complete_heterogeneity) %>%
-  rbind(df_changing_SDM)
+  rbind(df_changing_SDM) %>%
+  mutate(Seed = str_remove(Seed, "seed_"))
 ```
 
 ---
 
+Geom lines and geom points are not useful.
+
 ```{r}
+coop_rates %>%
+  mutate(seed = as.factor(Seed)) %>%
+  ggplot() +
+  geom_point(aes(round, value, color = seed)) +
+  facet_wrap(~tournament) +
+  labs(title = "Average cooperation ratio per seed per tournament type.",
+       x = "coop ratio",
+       y = "round") +
+  xlim(1000,9000)
+
+coop_rates %>%
+  mutate(seed = as.factor(Seed)) %>%
+  ggplot() +
+  geom_line(aes(round, value, color = seed)) +
+  facet_wrap(~tournament) +
+  labs(title = "Average cooperation ratio per seed per tournament type.",
+       x = "coop ratio",
+       y = "round") +
+  xlim(1000,9000)
+```
+
+Smooth functions __are__ useful.
+
+```{r}
+coop_max <- coop_rates %>%
+    group_by(tournament) %>%
+    summarise(max_coop = max(value))
+
 coop_rates %>%
   mutate(seed = as.factor(Seed)) %>%
   ggplot() +
@@ -97,9 +128,33 @@ coop_rates %>%
   facet_wrap(~tournament) +
   labs(title = "Average cooperation ratio per seed per tournament type.",
        x = "coop ratio",
-       y = "round") 
+       y = "round") +
+  xlim(1000,9000)
 ```
 
+```{r}
+coop_rates %>%
+  mutate(seed = as.factor(Seed)) %>%
+  ggplot() +
+  geom_smooth(aes(round, value), color = "black") +
+  facet_wrap(~tournament) +
+  labs(title = "Average cooperation ratio per seed per tournament type.",
+       x = "coop ratio",
+       y = "round") +
+  xlim(1000,9000)
+```
+
+```{r eval = F}
+coop_rates %>%
+  mutate(seed = as.factor(Seed)) %>%
+  ggplot() +
+  geom_point(aes(round, value), color = "black") +
+  facet_wrap(~tournament) +
+  labs(title = "Average cooperation ratio per seed per tournament type.",
+       x = "coop ratio",
+       y = "round") +
+  xlim(1000,9000)
+```
 
 ```{r}
 outliers %>%
@@ -112,7 +167,5 @@ outliers %>%
        x = "s.d.",
        y = "deviation from average") 
 ```
-
-
 
 </body>
