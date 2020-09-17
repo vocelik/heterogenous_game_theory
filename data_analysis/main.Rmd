@@ -45,13 +45,17 @@ df_outliers_control_group <- do.call(rbind, lapply(Sys.glob("../Control Group/Da
 
 df_outliers_complete_heterogeneity <- do.call(rbind, lapply(Sys.glob("../Complete Heterogeneity/Data/outliers/*.csv"), read_csv)) %>%
   mutate(tournament = "complete heterogeneity")
+
+df_outliers_chaning_SDM <- do.call(rbind, lapply(Sys.glob("../Changing SDM/Data/outliers/*.csv"), read_csv)) %>%
+  mutate(tournament = "changing SDM")
 ```
 
 Combine outliers
 
 ```{r}
 outliers <- df_outliers_complete_heterogeneity %>%
-  rbind(df_outliers_control_group)
+  rbind(df_outliers_control_group) %>%
+  rbind(df_outliers_chaning_SDM)
 ```
 
 Cooperation rates
@@ -68,12 +72,19 @@ df_complete_heterogeneity <- do.call(cbind, lapply(Sys.glob("../Complete Heterog
   mutate(tournament = "complete heterogeneity",
          round = row_number()) %>%
   pivot_longer(seed_1024:seed_8, names_to = "Seed")
+
+df_changing_SDM <- do.call(cbind, lapply(Sys.glob("../Changing SDM/Data/*.csv"), read_csv)) %>%
+  janitor::clean_names() %>%
+  mutate(tournament = "changing SDM",
+         round = row_number()) %>%
+  pivot_longer(seed_1024:seed_8, names_to = "Seed")
 ```
 
 Combine cooperation rates
 ```{r}
 coop_rates <- df_control_group %>%
-  rbind(df_complete_heterogeneity)
+  rbind(df_complete_heterogeneity) %>%
+  rbind(df_changing_SDM)
 ```
 
 ---
