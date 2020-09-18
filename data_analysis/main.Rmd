@@ -48,6 +48,9 @@ df_outliers_complete_heterogeneity <- do.call(rbind, lapply(Sys.glob("../Complet
 
 df_outliers_chaning_SDM <- do.call(rbind, lapply(Sys.glob("../Changing SDM/Data/outliers/*.csv"), read_csv)) %>%
   mutate(tournament = "changing SDM")
+
+df_outliers_chaning_SDEI <- do.call(rbind, lapply(Sys.glob("../Changing SDe and SDi/Data/outliers/*.csv"), read_csv)) %>%
+  mutate(tournament = "changing SDEI")
 ```
 
 Combine outliers
@@ -55,7 +58,8 @@ Combine outliers
 ```{r}
 outliers <- df_outliers_complete_heterogeneity %>%
   rbind(df_outliers_control_group) %>%
-  rbind(df_outliers_chaning_SDM)
+  rbind(df_outliers_chaning_SDM) %>%
+  rbind(df_outliers_chaning_SDEI)
 ```
 
 Cooperation rates
@@ -78,6 +82,12 @@ df_changing_SDM <- do.call(cbind, lapply(Sys.glob("../Changing SDM/Data/*.csv"),
   mutate(tournament = "changing SDM",
          round = row_number()) %>%
   pivot_longer(seed_1024:seed_8, names_to = "Seed")
+
+df_changing_SDEI <- do.call(cbind, lapply(Sys.glob("../Changing SDe and SDi/Data/*.csv"), read_csv)) %>%
+  janitor::clean_names() %>%
+  mutate(tournament = "changing SDEI",
+         round = row_number()) %>%
+  pivot_longer(seed_1024:seed_8, names_to = "Seed")
 ```
 
 Combine cooperation rates
@@ -85,6 +95,7 @@ Combine cooperation rates
 coop_rates <- df_control_group %>%
   rbind(df_complete_heterogeneity) %>%
   rbind(df_changing_SDM) %>%
+  rbind(df_changing_SDEI) %>%
   mutate(Seed = str_remove(Seed, "seed_"))
 ```
 
