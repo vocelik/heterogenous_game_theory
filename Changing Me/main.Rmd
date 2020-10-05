@@ -1,0 +1,73 @@
+---
+title: "Analysis"
+author: "Václav Ocelík"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+h1.title {
+  font-size: 38px;
+  text-align: center;
+}
+h4.author { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  text-align: center;
+</style>
+
+```{r setup, include=FALSE, message = F, echo = F}
+knitr::opts_chunk$set(echo = T, message = F, error = F,
+                      dpi = 300, fig.width = 6, fig.height = 4,
+                      warning = F)
+```
+
+<body>
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+theme_set(theme_classic())
+```
+
+```{r}
+df_outliers_control_group <- do.call(rbind, lapply(Sys.glob("../Control Group/Data/outliers/*.csv"), read_csv)) # make sure no other .csv files in target.
+df_outliers_control_group
+```
+
+```{r}
+df_control_group <- do.call(cbind, lapply(Sys.glob("../Control Group/Data/*.csv"), read_csv)) # make sure no other .csv files in target.
+df_control_group
+```
+
+```{r}
+df_outliers_control_group %>%
+    group_by(S.D.) %>%
+    summarise(average_outlier_count = floor(mean(Counts))) %>%
+    mutate(tournament = "control group") %>%
+    kable() %>%
+    kable_styling("striped",full_width = F)
+```
+
+
+```{r}
+df_control_group %>%
+    mutate(n = row_number()) %>%
+    pivot_longer(`Seed 1024`:`Seed 8`,names_to = "Seed", values_to = "level_of_cooperation") %>%
+    mutate(seed = as.factor(Seed)) %>%
+    ggplot(aes(n, level_of_cooperation, color = Seed)) +
+    geom_smooth(se = F) 
+```
+
+
+
+
+</body>
