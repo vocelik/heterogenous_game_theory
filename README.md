@@ -4,7 +4,7 @@ __NOTE__: if you are viewing this page in Google Chrome, we strongly advise to i
 
 ## Introduction
 
-This package is based on the [UvAAxelrod](https://github.com/RickGroeneweg/UvAAxelrod) package. The package simulates prisoner's dilemma between any number of _agents_ in a particular environment. Agents can, but need not, differ from one another based on three variables: _M_, _e_, and _i_. 
+This package is based on the [UvAAxelrod](https://github.com/RickGroeneweg/UvAAxelrod) package, which Rick Groeneweg, Vaclav Ocelik and Sebastian Krapohl developed for the research project GLOBAL CODE. The package simulates prisoner's dilemma between any number of _agents_ in a particular environment. Agents can, but need not, differ from one another based on three variables: _M_, _e_, and _i_. 
 
 For any agent pair _x_,_y_ the payoffs are calculated as follows:
 
