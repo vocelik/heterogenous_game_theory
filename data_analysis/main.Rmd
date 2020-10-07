@@ -112,7 +112,7 @@ coop_rates %>%
   labs(title = "Average cooperation ratio per seed per tournament type.",
        x = "coop ratio",
        y = "round") +
-  xlim(1000,9000)
+  xlim(2000,7000)
 
 coop_rates %>%
   mutate(seed = as.factor(Seed)) %>%
@@ -150,20 +150,17 @@ coop_rates %>%
   geom_smooth(aes(round, value), color = "black") +
   facet_wrap(~tournament) +
   labs(title = "Average cooperation ratio per seed per tournament type.",
-       x = "coop ratio",
-       y = "round") +
+       x = "round",
+       y = "coop ratio") +
   xlim(1000,9000)
-```
 
-```{r eval = F}
 coop_rates %>%
   mutate(seed = as.factor(Seed)) %>%
   ggplot() +
-  geom_point(aes(round, value), color = "black") +
-  facet_wrap(~tournament) +
+  geom_smooth(aes(round, value, color = tournament)) +
   labs(title = "Average cooperation ratio per seed per tournament type.",
-       x = "coop ratio",
-       y = "round") +
+       x = "round",
+       y = "coop ratio") +
   xlim(1000,9000)
 ```
 
@@ -174,6 +171,16 @@ outliers %>%
   geom_point(aes(S.D., Counts, color = seed)) +
   geom_smooth(aes(S.D., Counts), color = "black") +
   facet_wrap(~tournament) +
+  labs(title = "The instability of the average rage of cooperation.",
+       x = "s.d.",
+       y = "deviation from average") 
+```
+
+```{r}
+outliers %>%
+  mutate(seed = as.factor(Seed)) %>%
+  ggplot() +
+  geom_smooth(aes(S.D., Counts, color = tournament)) +
   labs(title = "The instability of the average rage of cooperation.",
        x = "s.d.",
        y = "deviation from average") 
