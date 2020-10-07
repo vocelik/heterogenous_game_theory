@@ -70,10 +70,10 @@ Finally, we run the tournament and save the results.
 
 `draw_stack` draws a stackplot of market share on the y-axis and round number on the x-axis. This plot allows us to inspect how the different strategies in our population have captured market share in the simulation. 
 
-![draw_stack](images/draw_stack.png)
+![draw_stack](https://github.com/vocelik/heterogenous_game_theory/blob/master/images/draw_stack.png)
 
 `C_D_ratios_per_round_var` plots the average cooperation ratio on the y-axis and the round number on the x-axis. The black line constitutes the average of the entire tournament. The yellow and red lines capture the upper and lower bounds of the desired standard deviation, the default being 1. Points outside the yellow and red lines signal periods of high or low levels of cooperation. This plot allows us to inspect how the average cooperation ratio evolves over the tournament, as well as how stable this level is. 
 
-![coop_ratio](images/cd_ratios.png)
+![coop_ratio](https://github.com/vocelik/heterogenous_game_theory/blob/master/images/cd_ratios.png)
 
 The output of the simulation is saved in two csv files. The first saves the average cooperation rate of each round, while the second saves the absolute number of extreme periods of cooperation/defection for a standard deviation ranging from 0.5 to 3. A period starts whenever the line exits the area between the yellow and red line and ends whenever the line returns. 
