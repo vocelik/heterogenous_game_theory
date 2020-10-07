@@ -8,7 +8,7 @@ This package is based on the [UvAAxelrod](https://github.com/RickGroeneweg/UvAAx
 
 For any agent pair _x_,_y_ the payoffs are calculated as follows:
 
-$$ R  = (x_{e} - x_{i} * y_{m}) * y_m $$
+$$ R  = (x_{e} - x_{i} * y_{e}) * y_m $$
 $$ T  = x_{e} * y_{m} $$
 $$ S  = -x_{i} * y_{e} * y_{m} $$
 $$ P  = 0 $$
