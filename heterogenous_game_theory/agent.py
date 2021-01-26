@@ -6,13 +6,13 @@ class Agent:
     stores agent hyperparamaters, but also state from the simulation.
     """
     
-    def __init__(self, name, m, e, i): 
+    def __init__(self, name, m, d, r): 
         
         # Variables that stay the same during simulations
-        self.name = name
-        self.m = m
-        self.e = e
-        self.i = i
+        self.name = name # index
+        self.m = m # mass
+        self.d = d  # dependence
+        self.r = r # rivalry
         self.self_reward = None
         
         # State variables, not yet initialized since that will be done in the tournament
