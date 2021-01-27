@@ -4,20 +4,24 @@ __NOTE__: if you are viewing this page in Google Chrome, we strongly advise to i
 
 ## Introduction
 
-This package is based on the [UvAAxelrod](https://github.com/RickGroeneweg/UvAAxelrod) package, which Rick Groeneweg, Václav Ocelík and Sebastian Krapohl developed for the research project GLOBAL CODE. The package simulates prisoner's dilemma between any number of _agents_ in a particular environment. Agents can, but need not, differ from one another based on three variables: _M_, _e_, and _i_. 
+This package is based on the [UvAAxelrod](https://github.com/RickGroeneweg/UvAAxelrod) package, which Rick Groeneweg, Václav Ocelík and Sebastian Krapohl developed for the research project GLOBAL CODE. The package simulates prisoner's dilemma between any number of _agents_ in a particular environment. Agents can, but need not, differ from one another based on three variables: _M_, _d_, and _r_. 
 
 For any agent pair _x_,_y_ the payoffs are calculated as follows:
 
-$$ T  = (x_{e} + x_{i} * y_{e}) * y_{m} $$
-$$ R  = x_{e} * y_m $$
-$$ P  = x_{i} * y_{e} * y_{m} $$
+$$ T  = (x_{d} 2 * + x_{r}) * y_{m} $$
+$$ R  = (x_{d} + x_{r}) * y_m $$
+$$ P  = x_{r} * y_{m} $$
 $$ S  = 0 $$
 
-For all but the most extreme values of _M_, _e_, and _i_. This satisfies the condition for the prisoner's dilemma:
+For all values of _M_, _d_, and _r_. This satisfies the condition for the prisoner's dilemma:
 
-$$ T>R>P>S$$
+$$ T>R>P>S $$
 
-The variables can be a constant, or can be drawn from a normal or pareto distribution. The user can specify any combination of constants and distribution. For example, _M_ can be set to 1000 with 0 variation, _i_ can have an average of _0.1_ and a standard deviation of _0.2_, and _e_ can have an average of _0.1_ and a shape of _4_. This allows the user to create a population of agents that is completely homogenous, completely heterogenous, and anywhere in between. 
+and
+
+$$ 2R > T + S $$
+
+The variables can be a constant, or can be drawn from a normal or power distribution. The user can specify any combination of constants and distribution. For example, _M_ can be set to 5 with 0 variation, _d_ can have an average of _0.1_ and a standard deviation of _0.2_, and _r_ can have an average of _0.1_ and a shape of _4_. This allows the user to create a population of agents that is completely homogenous, completely heterogenous, and anywhere in between. 
 
 ## Instructions
 
@@ -35,10 +39,10 @@ Running a tournament is fairly straightforward. We import all files in the packa
 Next, we create a set of agents with a particular distribution and check the parameters of these agents. Notice how we input "power" into `E[0]` to indicate we want a pareto distribution. If we set `homogenous = True`, we need not create `M`, `E`, or `I` separately.
 
     M = [1000, 2000]
-    E = ["power", 0.1, 6]
-    I = [0.1, 1/10000]
+    D = ["power", 0.1, 6]
+    R = [0.1, 1/10000]
 
-    agents = get_agents(homogenous = False, number_of_agents = 100, M = M, E = E, I = I)
+    agents = get_agents(homogenous = False, number_of_agents = 100, M = M, D = D, R = R)
     check_parameters(agents)
     compare_payoff_function(agents, default_payoff_functions)
 
