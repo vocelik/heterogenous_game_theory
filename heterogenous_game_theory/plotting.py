@@ -576,17 +576,13 @@ def fourier_instability(dataframe, n_peaks):
 
     return df_fin
 
-def save_tournament_csv(tournament, type_of_tournament = None, seed = None, type_of_file = ".csv"):
+def save_tournament_csv(tournament, seed = None, type_of_file = ".csv"):
     
     """
     Takes the tournament object as input and saves
     the cooperation rate of the tournament by default to a csv file.
     Please specify the type of the tournament
     """
-    
-    if not isinstance(type_of_tournament, str):
-        
-        raise Exception("Please specificy by inputting a string whether the population was _homogenous or _heterogenous!")
 
     if not isinstance(seed, str):
 
@@ -596,7 +592,7 @@ def save_tournament_csv(tournament, type_of_tournament = None, seed = None, type
     fractions_c = [round(num_c / (num_c + num_d), 3) for num_c, num_d in zip(array_dict[C], array_dict[D])]
     fractions_c = np.array(fractions_c)
     fractions_c = pd.DataFrame({'Seed ' + str(seed) : fractions_c})
-    fractions_c.to_csv("Data/data_" + str(seed) + str(type_of_tournament) + str(type_of_file), encoding='utf-8', index = False)
+    fractions_c.to_csv("data/coop_ratio/data_" + str(seed) + str(type_of_file), encoding='utf-8', index = False)
     
 def get_rewards(population, payoff_functions, distance_function):
     """

@@ -4,14 +4,14 @@ __NOTE__: if you are viewing this page in Google Chrome, we strongly advise to i
 
 ## Introduction
 
-This package is based on the [UvAAxelrod](https://github.com/RickGroeneweg/UvAAxelrod) package. The package simulates prisoner's dilemma between any number of _agents_ in a particular environment. Agents can, but need not, differ from one another based on three variables: _M_, _e_, and _i_. 
+This package is based on the [UvAAxelrod](https://github.com/RickGroeneweg/UvAAxelrod) package, which Rick Groeneweg, Václav Ocelík and Sebastian Krapohl developed for the research project GLOBAL CODE. The package simulates prisoner's dilemma between any number of _agents_ in a particular environment. Agents can, but need not, differ from one another based on three variables: _M_, _e_, and _i_. 
 
 For any agent pair _x_,_y_ the payoffs are calculated as follows:
 
-$$ R  = (x_{e} - x_{i} * y_{m}) * y_m$$
-$$ T  = x_{e} * y_{m}$$
-$$ S  = -x_{i} * y_{e} * y_{m}$$
-$$ P  = 0$$
+$$ T  = (x_{e} + x_{i} * y_{e}) * y_{m} $$
+$$ R  = x_{e} * y_m $$
+$$ P  = x_{i} * y_{e} * y_{m} $$
+$$ S  = 0 $$
 
 For all but the most extreme values of _M_, _e_, and _i_. This satisfies the condition for the prisoner's dilemma:
 
@@ -70,3 +70,10 @@ Finally, we run the tournament and save the results.
 
 `draw_stack` draws a stackplot of market share on the y-axis and round number on the x-axis. This plot allows us to inspect how the different strategies in our population have captured market share in the simulation. 
 
+![draw_stack](https://github.com/vocelik/heterogenous_game_theory/blob/master/images/draw_stack.png)
+
+`C_D_ratios_per_round_var` plots the average cooperation ratio on the y-axis and the round number on the x-axis. The black line constitutes the average of the entire tournament. The yellow and red lines capture the upper and lower bounds of the desired standard deviation, the default being 1. Points outside the yellow and red lines signal periods of high or low levels of cooperation. This plot allows us to inspect how the average cooperation ratio evolves over the tournament, as well as how stable this level is. 
+
+![coop_ratio](https://github.com/vocelik/heterogenous_game_theory/blob/master/images/cd_ratios.png)
+
+The output of the simulation is saved in two csv files. The first saves the average cooperation rate of each round, while the second saves the absolute number of extreme periods of cooperation/defection for a standard deviation ranging from 0.5 to 3. A period starts whenever the line exits the area between the yellow and red line and ends whenever the line returns. 

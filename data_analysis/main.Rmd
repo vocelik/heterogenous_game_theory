@@ -46,11 +46,14 @@ df_outliers_control_group <- do.call(rbind, lapply(Sys.glob("../Control Group/Da
 df_outliers_complete_heterogeneity <- do.call(rbind, lapply(Sys.glob("../Complete Heterogeneity/Data/outliers/*.csv"), read_csv)) %>%
   mutate(tournament = "complete heterogeneity")
 
-df_outliers_chaning_SDM <- do.call(rbind, lapply(Sys.glob("../Changing SDM/Data/outliers/*.csv"), read_csv)) %>%
+df_outliers_changing_SDM <- do.call(rbind, lapply(Sys.glob("../Changing SDM/Data/outliers/*.csv"), read_csv)) %>%
   mutate(tournament = "changing SDM")
 
 df_outliers_chaning_SDEI <- do.call(rbind, lapply(Sys.glob("../Changing SDe and SDi/Data/outliers/*.csv"), read_csv)) %>%
   mutate(tournament = "changing SDEI")
+
+df_outliers_power_law <- do.call(rbind, lapply(Sys.glob("../Power Law Changing SDM/Data/outliers/*.csv"), read_csv)) %>% 
+  mutate(tournament = "power_law")
 ```
 
 Combine outliers
@@ -58,8 +61,9 @@ Combine outliers
 ```{r}
 outliers <- df_outliers_complete_heterogeneity %>%
   rbind(df_outliers_control_group) %>%
-  rbind(df_outliers_chaning_SDM) %>%
-  rbind(df_outliers_chaning_SDEI)
+  rbind(df_outliers_changing_SDM) %>%
+  rbind(df_outliers_chaning_SDEI) %>%
+  rbind(df_outliers_power_law)
 ```
 
 Cooperation rates
@@ -88,6 +92,12 @@ df_changing_SDEI <- do.call(cbind, lapply(Sys.glob("../Changing SDe and SDi/Data
   mutate(tournament = "changing SDEI",
          round = row_number()) %>%
   pivot_longer(seed_1024:seed_8, names_to = "Seed")
+
+df_power_law <- do.call(cbind, lapply(Sys.glob("../Power Law Changing SDM/Data/*.csv"), read_csv)) %>%
+  janitor::clean_names() %>%
+  mutate(tournament = "power law",
+         round = row_number()) %>%
+  pivot_longer(seed_1024:seed_8, names_to = "Seed")
 ```
 
 Combine cooperation rates
@@ -96,6 +106,7 @@ coop_rates <- df_control_group %>%
   rbind(df_complete_heterogeneity) %>%
   rbind(df_changing_SDM) %>%
   rbind(df_changing_SDEI) %>%
+  rbind(df_power_law) %>%
   mutate(Seed = str_remove(Seed, "seed_"))
 ```
 
@@ -112,7 +123,7 @@ coop_rates %>%
   labs(title = "Average cooperation ratio per seed per tournament type.",
        x = "coop ratio",
        y = "round") +
-  xlim(1000,9000)
+  xlim(2000,7000)
 
 coop_rates %>%
   mutate(seed = as.factor(Seed)) %>%
@@ -150,20 +161,17 @@ coop_rates %>%
   geom_smooth(aes(round, value), color = "black") +
   facet_wrap(~tournament) +
   labs(title = "Average cooperation ratio per seed per tournament type.",
-       x = "coop ratio",
-       y = "round") +
+       x = "round",
+       y = "coop ratio") +
   xlim(1000,9000)
-```
 
-```{r eval = F}
 coop_rates %>%
   mutate(seed = as.factor(Seed)) %>%
   ggplot() +
-  geom_point(aes(round, value), color = "black") +
-  facet_wrap(~tournament) +
+  geom_smooth(aes(round, value, color = tournament)) +
   labs(title = "Average cooperation ratio per seed per tournament type.",
-       x = "coop ratio",
-       y = "round") +
+       x = "round",
+       y = "coop ratio") +
   xlim(1000,9000)
 ```
 
@@ -174,7 +182,17 @@ outliers %>%
   geom_point(aes(S.D., Counts, color = seed)) +
   geom_smooth(aes(S.D., Counts), color = "black") +
   facet_wrap(~tournament) +
-  labs(title = "The instability of the average rage of cooperation.",
+  labs(title = "The instability of the average rate of cooperation.",
+       x = "s.d.",
+       y = "deviation from average") 
+```
+
+```{r}
+outliers %>%
+  mutate(seed = as.factor(Seed)) %>%
+  ggplot() +
+  geom_smooth(aes(S.D., Counts, color = tournament)) +
+  labs(title = "The instability of the average rate of cooperation.",
        x = "s.d.",
        y = "deviation from average") 
 ```
