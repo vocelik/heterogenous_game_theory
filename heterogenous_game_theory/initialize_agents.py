@@ -20,15 +20,9 @@ def get_agents(homogenous = True, power = False, number_of_agents = 100, M = [],
     if homogenous:
         # if homogenous we create four columns with default values
         agents_test = ["Agent " + str(i) for i in range(number_of_agents)]
-<<<<<<< HEAD
         M = [5 for i in range(number_of_agents)]
         D = [0.4 for i in range(number_of_agents)]
         R = [0.3 for i in range(number_of_agents)]
-=======
-        M = [10 for i in range(number_of_agents)]
-        E = [0.3 for i in range(number_of_agents)]
-        I = [0.3 for i in range(number_of_agents)]
->>>>>>> 2a27685c6f91b87ce259036064804a7d644831c2
 
         data = { "Agents": agents_test, "M" : M, "D" : D, "R" : R}
         df = pd.DataFrame.from_dict(data)
