@@ -6,7 +6,7 @@ from scipy.stats import truncnorm
 from itertools import combinations
 import matplotlib.pyplot as plt
 
-def get_agents(homogenous = True, power = False, number_of_agents = 100, M = [], D = [], R = []):
+def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []):
 
     """
     This function creates a set of agents of size number_of_agents. To allow for maxmimum customization,
