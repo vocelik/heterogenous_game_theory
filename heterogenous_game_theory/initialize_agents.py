@@ -14,9 +14,6 @@ def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []
     if the distribution of an element should follow a power-law by making the first element of M, D, and/or R
     'power'. Otherwise, the element will follow a normal distribution. 
     """
-
-    agents_test = ["Agent " + str(i) for i in range(number_of_agents)]
-
     if homogenous:
         # if homogenous we create four columns with default values
         agents_test = ["Agent " + str(i) for i in range(number_of_agents)]
@@ -35,45 +32,41 @@ def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []
         
         return agents
 
+    # if not homogenous we need to take into account different combinations of distributions. 
     if M[0] == "power":
-
         x_m, alpha_m = M[1], M[2]
         samples_m = (np.random.pareto(alpha_m, 1000) + 1) * x_m
-        samples_ints_m = [int(round(i)) for i in samples_m]
+        samples_ints_m = [round(i,1) for i in samples_m]
         M = [np.random.choice(samples_ints_m) for i in range(number_of_agents)]
-
+        M = [v if v < 10.0 else 10 for v in M]
     else:
-
         # if the distribution does not follow a power law, we take a truncated normal distribution
-        M_trunc = get_truncated_normal(mean=M[0], sd = M[1], low = 1, upp = M[0] + 10 * M[1])
-        M = [round(np.random.choice([round(i) for i in M_trunc.rvs(1000)])) for i in range(number_of_agents)]
+        M_trunc = get_truncated_normal(mean=M[0], sd = M[1], low = 0, upp = 10)
+        M = [round(np.random.choice([i for i in M_trunc.rvs(1000)]), 1) for i in range(number_of_agents)]
         
     # we repeat this for the other variables 
     if D[0] == "power":
-
         x_d, alpha_d = D[1], D[2]
         samples_d = (np.random.pareto(alpha_d, 1000) + 1) * x_d
         samples_ints_d = [round(i,2) for i in samples_d]
         D = [np.random.choice(samples_ints_d) for i in range(number_of_agents)]
         D = [v if v < 1.0 else 1 for v in D] # the max value D can take is 1
-
     else:
         D_trunc = get_truncated_normal(mean=D[0], sd = D[1], low = 0, upp = 1)
-        D = [round(np.random.choice([round(i, 2) for i in D_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
+        D = [round(np.random.choice([i for i in D_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
     
     if R[0] == "power":
-
         x_r, alpha_r = R[1], R[2]
         samples_r = (np.random.pareto(alpha_r, 1000) + 1) * x_r
         samples_ints_r = [round(i,2) for i in samples_r]
         R = [np.random.choice(samples_ints_r) for i in range(number_of_agents)]
         R = [v if v < 1.0 else 1 for v in R]
-
     else:
         R_trunc = get_truncated_normal(mean=R[0], sd = R[1], low = 0, upp = 1)
-        R = [round(np.random.choice([round(i, 2) for i in R_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
+        R = [round(np.random.choice([i for i in R_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
 
-    data = { "Agents": agents_test, "M" : M, "D" : D, "R" : R}
+    agents_test = ["Agent " + str(i) for i in range(number_of_agents)]
+    data = {"Agents": agents_test, "M" : M, "D" : D, "R" : R}
     df = pd.DataFrame.from_dict(data)
 
     # now we create the agent objects
@@ -91,10 +84,10 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
 
 def check_parameters(agents):
     
-    sdm = round(np.std([agent.m for agent in agents]))
+    sdm = round(np.std([agent.m for agent in agents]),2)
     sdi =round(np.std([agent.r for agent in agents]),2)
     sde = round(np.std([agent.d for agent in agents]),2)
-    mm = int(round(np.mean([agent.m for agent in agents])))
+    mm = round(np.mean([agent.m for agent in agents]),2)
     mi = round(np.mean([agent.r for agent in agents]),2)
     me = round(np.mean([agent.d for agent in agents]),2)
     
@@ -104,7 +97,7 @@ def check_parameters(agents):
     print(37 * "-")
     
     for agent in agents[0:19]:
-        print("|", int(round(agent.m)), "\t\t", agent.d, "\t\t", agent.r, "|")
+        print("|", agent.m, "\t\t", agent.d, "\t\t", agent.r, "|")
         
     print(37 * "-")
     
@@ -187,9 +180,10 @@ def compare_payoff_function(agents, payoff_functions):
             P.append(PP[1])
 
         for i in range(len(R)):
-            if T[i] > R[i] > P[i] > S[i]:
+            if T[i] >= R[i] >= P[i] >= S[i]:
                 continue
             else:
+                print(i)
                 print("NOT ALL PLAYERS ARE PLAYING A PRISONER'S DILEMMA")
                 return False
 

@@ -231,9 +231,9 @@ def C_D_ratios_per_round_var(tournament, x_size = 40, y_size = 10, constant = 1,
 
     fig, ax = plt.subplots(figsize =(40, 10))
     ax.plot(t, smiddle, t, slower, t, supper)
-    plt.xlabel('Round number', fontsize = 12)
-    plt.ylabel('Cooperation ratio', fontsize = 12)
-    plt.tick_params(axis='both',labelsize=12)
+    plt.xlabel('Round number', fontsize = 36)
+    plt.ylabel('Cooperation ratio', fontsize = 36)
+    plt.tick_params(axis='both',labelsize=24)
     plt.hlines(y=average_line, xmin = 0, xmax = tournament.round, color = 'black', label='Average cooperation ratio: '+ str(average_line.round(2)))
     plt.hlines(y=average_line + np.std(fractions_c) * constant, xmin = 0, xmax = tournament.round, color = 'red')
     plt.hlines(y=average_line - np.std(fractions_c) * constant, xmin = 0, xmax = tournament.round, color = 'blue')
