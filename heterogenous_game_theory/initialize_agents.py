@@ -35,6 +35,7 @@ def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []
     # if not homogenous we need to take into account different combinations of distributions. 
     if M[0] == "power":
         x_m, alpha_m = M[1], M[2]
+        # from numpy documentation: The classical Pareto distribution can be obtained from the Lomax distribution by adding 1 and multiplying by the scale parameter m.
         samples_m = (np.random.pareto(alpha_m, 100000) + 1) * x_m
         samples_ints_m = [round(i,1) for i in samples_m]
         samples_ints_m = [i for i in samples_ints_m if i <= 10]
