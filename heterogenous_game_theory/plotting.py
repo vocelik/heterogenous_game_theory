@@ -292,8 +292,8 @@ def draw_stack(tournament, rounds=None, cmap = 'Greys_r', x_size = 40, y_size = 
     fig, ax = plt.subplots(figsize =(x_size, y_size,))
     ax.stackplot(range(rounds+1), *matrix, labels=[s.name for s in tournament.strategy_list], colors= colors) #this needs to be adjusted for the number of strategies
     ax.legend(loc='upper right',bbox_to_anchor=(0.95,0.95),ncol=1, fontsize=36)
-    plt.ylabel('Market share', fontsize=36)
-    plt.xlabel('Round number', fontsize=36)
+    plt.ylabel('Market share', fontsize=56)
+    plt.xlabel('Round number', fontsize=56)
     plt.tick_params(axis='both',labelsize=24)
 
 def draw_agent_line(agent, cmap, strategy_list): #need to add a color legend and color line option
