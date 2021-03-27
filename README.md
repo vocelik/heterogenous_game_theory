@@ -38,15 +38,18 @@ Running a tournament is fairly straightforward. We import all files in the packa
 
 Next, we create a set of agents with a particular distribution and check the parameters of these agents. Notice how we input "power" into `E[0]` to indicate we want a pareto distribution. If we set `homogenous = True`, we need not create `M`, `E`, or `I` separately.
 
-    M = [1000, 2000]
-    D = ["power", 0.1, 6]
-    R = [0.1, 1/10000]
+    tour_type = "hetero_mdr_sd_min"
+    M = [5, 0.5]
+    R = [0.4, 0.05]
+    D = [0.3, 0.05]
 
     agents = get_agents(homogenous = False, number_of_agents = 100, M = M, D = D, R = R)
     check_parameters(agents)
     compare_payoff_function(agents, default_payoff_functions)
 
 `check_parameters` prints the characteristics of the first twenty agents, as well as a histogram of all agents' characteristics. `compare_payoff_function` prints the payoffs of the first ten agent pairs. These can be used in conjunction to quickly inspect if everything worked as intended.  
+
+![check_parameters](https://github.com/vocelik/heterogenous_game_theory/blob/master/images/population_distribution.png)
 
 Finally, we run the tournament and save the results.
 
@@ -69,8 +72,8 @@ Finally, we run the tournament and save the results.
     data = {'S.D.': list(outliers.keys()), 'Counts': list(outliers.values())}
     df = pd.DataFrame.from_dict(data)
     print(df)
-    df.to_csv("Data/data_" + str(seed) + "_outliercounts.csv", encoding='utf-8', index = False, float_format='%.1f')
-    save_tournament_csv(tour, type_of_tournament= "complete_heterogeneity", seed = str(seed))
+    df.to_csv("data/outliers/" + str(seed) + "_outlier_counts.csv", encoding='utf-8', index = False, float_format='%.1f')
+    save_tournament_csv(tour, seed = str(seed), tour_type = tour_type)
 
 `draw_stack` draws a stackplot of market share on the y-axis and round number on the x-axis. This plot allows us to inspect how the different strategies in our population have captured market share in the simulation. 
 
@@ -78,6 +81,6 @@ Finally, we run the tournament and save the results.
 
 `C_D_ratios_per_round_var` plots the average cooperation ratio on the y-axis and the round number on the x-axis. The black line constitutes the average of the entire tournament. The yellow and red lines capture the upper and lower bounds of the desired standard deviation, the default being 1. Points outside the yellow and red lines signal periods of high or low levels of cooperation. This plot allows us to inspect how the average cooperation ratio evolves over the tournament, as well as how stable this level is. 
 
-![coop_ratio](https://github.com/vocelik/heterogenous_game_theory/blob/master/images/cd_ratios.png)
+![coop_ratio](https://github.com/vocelik/heterogenous_game_theory/blob/master/images/coop_ratio_stability.png)
 
 The output of the simulation is saved in two csv files. The first saves the average cooperation rate of each round, while the second saves the absolute number of extreme periods of cooperation/defection for a standard deviation ranging from 0.5 to 3. A period starts whenever the line exits the area between the yellow and red line and ends whenever the line returns. 
