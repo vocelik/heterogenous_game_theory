@@ -6,7 +6,7 @@ from scipy.stats import truncnorm
 from itertools import combinations
 import matplotlib.pyplot as plt
 
-def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []):
+def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = [], W = []):
 
     """
     This function creates a set of agents of size number_of_agents. To allow for maxmimum customization,
@@ -14,20 +14,22 @@ def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []
     if the distribution of an element should follow a power-law by making the first element of M, D, and/or R
     'power'. Otherwise, the element will follow a normal distribution. 
     """
+
     if homogenous:
         # if homogenous we create four columns with default values
         agents_test = ["Agent " + str(i) for i in range(number_of_agents)]
         M = [5 for i in range(number_of_agents)]
         D = [0.4 for i in range(number_of_agents)]
         R = [0.3 for i in range(number_of_agents)]
+        W = [1 for i in range(number_of_agents)]
 
-        data = { "Agents": agents_test, "M" : M, "D" : D, "R" : R}
+        data = { "Agents": agents_test, "M" : M, "D" : D, "R" : R, "W": W} 
         df = pd.DataFrame.from_dict(data)
         
         agents = []
 
         for name in df.index:
-            agent = Agent(name, df['M'].at[name], df['D'].at[name], df['R'].at[name])
+            agent = Agent(name, df['M'].at[name], df['D'].at[name], df['R'].at[name],df['W'].at[name] )
             agents.append(agent)
         
         return agents
@@ -53,7 +55,7 @@ def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []
         samples_ints_d = [i for i in samples_ints_d if i <= 1]
         D = [np.random.choice(samples_ints_d) for i in range(number_of_agents)]
     else:
-        D_trunc = get_truncated_normal(mean=D[0], sd = D[1], low = 0, upp = 1)
+        D_trunc = get_truncated_normal(mean=D[0], sd = D[1], low = 0.01, upp = 1)
         D = [round(np.random.choice([i for i in D_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
     
     if R[0] == "power":
@@ -63,18 +65,29 @@ def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []
         samples_ints_r = [i for i in samples_ints_r if i <= 1]
         R = [np.random.choice(samples_ints_r) for i in range(number_of_agents)]
     else:
-        R_trunc = get_truncated_normal(mean=R[0], sd = R[1], low = 0, upp = 1)
+        R_trunc = get_truncated_normal(mean=R[0], sd = R[1], low = 0.01, upp = 1)
         R = [round(np.random.choice([i for i in R_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
 
+
+    if W[0] == "power":
+        x_r, alpha_r = W[1], W[2]
+        samples_r = (np.random.pareto(alpha_r, 100000) + 1) * x_r
+        samples_ints_r = [round(i,2) for i in samples_r]
+        samples_ints_r = [i for i in samples_ints_r if i <= 1]
+        W = [np.random.choice(samples_ints_r) for i in range(number_of_agents)]
+    else:
+        W_trunc = get_truncated_normal(mean=W[0], sd = W[1], low = 0, upp = 1)
+        W = [round(np.random.choice([i for i in W_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
+
     agents_test = ["Agent " + str(i) for i in range(number_of_agents)]
-    data = {"Agents": agents_test, "M" : M, "D" : D, "R" : R}
+    data = {"Agents": agents_test, "M" : M, "D" : D, "R" : R, "W" : W}
     df = pd.DataFrame.from_dict(data)
 
     # now we create the agent objects
     agents = []
 
     for name in df.index:
-        agent = Agent(name, df['M'].at[name], df['D'].at[name], df['R'].at[name])
+        agent = Agent(name, df['M'].at[name], df['D'].at[name], df['R'].at[name], df['W'].at[name])
         agents.append(agent)
 
     return agents
@@ -86,7 +99,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
 def check_parameters(agents):
     
     sdm = round(np.std([agent.m for agent in agents]),2)
-    sdi =round(np.std([agent.r for agent in agents]),2)
+    sdi = round(np.std([agent.r for agent in agents]),2)
     sde = round(np.std([agent.d for agent in agents]),2)
     mm = round(np.mean([agent.m for agent in agents]),2)
     mi = round(np.mean([agent.r for agent in agents]),2)

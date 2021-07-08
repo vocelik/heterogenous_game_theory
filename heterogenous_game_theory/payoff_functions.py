@@ -12,19 +12,19 @@ def selfreward(agent):
 
 def reward(agent, other):
     '''calculates how much reward would change fitness'''
-    return round( (agent.d + agent.r) * other.m, 1)
+    return round((agent.d + agent.r) * other.m + (agent.w * agent.m), 2)
 
 def temptation(agent, other):
     '''calculates how much temptation would change fitness'''
-    return round( (agent.d + 2 * agent.r) *  other.m, 1)
+    return round((agent.d + 2 * agent.r) * other.m + (agent.w * agent.m), 2)
 
 def sucker(agent, other):
     '''calculates how much sucker would change fitness'''
-    return 0
+    return round(agent.w * agent.m, 2)
 
 def punishment(agent, other):
     '''calculates how much punishment would chage fitness'''
-    return round(agent.r * other.m, 1)
+    return round(agent.r * other.m + agent.w * agent.m, 2)
 
 default_payoff_functions = {
         'R': reward,

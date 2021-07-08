@@ -86,4 +86,4 @@ def APavlov(selfmoves, othermoves):
         # TFT
         return D if othermoves[-1:] == [D] else C  
 
-APavlov.name = 'Adaptive Pavlov'
+    APavlov.name = 'Adaptive Pavlov'

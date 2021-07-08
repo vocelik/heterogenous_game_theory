@@ -1,5 +1,5 @@
 """
-This file contains functions, that plot and aggregate results from a simulation
+This file contains functions that plot and aggregate results from a simulation
 from the Tournament class.
 """
 
@@ -120,6 +120,13 @@ def get_game_history(tournament, c1, c2):
         return zip(data['history_1'],data['history_2'])
 
 def outcomes_dict_per_round(tournament):
+    """
+    retuns:
+        - dict, with thre keys"
+            - Action.C: array with the number of cooperations per round
+            - Action.D: array with the number of defections per round
+    """
+
     array_dict= {'Mutual_Cooperation': np.zeros((tournament.round,)), 'Mutual_Defection': np.zeros((tournament.round,)), 'Exploitation': np.zeros((tournament.round,))}
 
     for agent_1, agent_2 in tournament.graph.edges(data=False):     
@@ -213,7 +220,7 @@ def C_D_ratios_per_round(tournament, x_size=40, y_size=10):
     plt.ylabel('Cooperation ratio', fontsize=36)
     plt.tick_params(axis='both',labelsize=24)
 
-def C_D_ratios_per_round_var(tournament, x_size = 40, y_size = 10, constant = 1, x_lim = None):
+def C_D_ratios_per_round_var(tournament, x_size = 40, y_size = 20, constant = 1, x_lim = None):
 
     array_dict = C_D_dict_per_round(tournament)
     fractions_c = [round(num_c/(num_c + num_d), 3) for num_c, num_d in zip(array_dict[C], array_dict[D])]
@@ -229,19 +236,19 @@ def C_D_ratios_per_round_var(tournament, x_size = 40, y_size = 10, constant = 1,
     slower = np.ma.masked_where(s > lower, s)
     smiddle = np.ma.masked_where((s < lower) | (s > upper), s)
 
-    fig, ax = plt.subplots(figsize =(40, 10))
+    fig, ax = plt.subplots(figsize =(x_size, y_size))
     ax.plot(smiddle, color = "black")
     ax.plot(slower, color = "grey")
     ax.plot(supper, color = "grey")
     #ax.plot(t, smiddle, t, slower, t, supper)
-    plt.xlabel('Round number', fontsize = 36)
-    plt.ylabel('Cooperation ratio', fontsize = 36)
+    plt.xlabel('Round number', fontsize = 56)
+    plt.ylabel('Cooperation ratio', fontsize = 56)
     plt.tick_params(axis='both',labelsize=24)
-    plt.hlines(y=average_line, xmin = 0, xmax = tournament.round, color = 'black', linestyles='dashed')
-    plt.hlines(y=average_line + np.std(fractions_c) * constant, xmin = 0, xmax = tournament.round, color = 'black', linestyles='dashed')
-    plt.hlines(y=average_line - np.std(fractions_c) * constant, xmin = 0, xmax = tournament.round, color = 'black', linestyles='dashed')
+    plt.hlines(y=average_line, xmin = 0, xmax = tournament.round, color = 'black', linestyles='dashed', label="mean " + str(average_line))
+    plt.hlines(y=average_line + np.std(fractions_c) * constant, xmin = 0, xmax = tournament.round, color = 'black', linestyles='dashdot', label = "upper")
+    plt.hlines(y=average_line - np.std(fractions_c) * constant, xmin = 0, xmax = tournament.round, color = 'black', linestyles='dashdot', label = "lower")
     plt.xlim(x_lim)
-    plt.legend(fontsize = 14)
+    plt.legend(fontsize = 32)
 
 def count_outliers(tournament, constants = [1]):
 
@@ -417,169 +424,7 @@ def draw_population_delta_fitness(tournament, selecting=[], filtering = [], cmap
     plt.ylabel("Fitness Change", fontsize = 24)
     plt.tick_params(axis='both',labelsize=14)     
 
-def fourier_analysis(df,  fig_title = "Fourier Analysis", x_lim = None, fig_size = (30,10), save_fig = False, fig_style = 'default', legend_loc = 'upper right'):
-    
-    """
-    Takes an input and returns a plot of the fast fourier transform of the input.
-    Note that the valid inputs are: a python list, a numpy array, or a pandas dataframe.
-    Make sure you import pandas as pd and numpy as np.
-    
-    Best option is to input a pandas dataframe to get the labels too.
-    """
-    
-    # check if input is valid, else return exception. 
-    if not isinstance(df, (pd.core.frame.DataFrame, list, np.ndarray, pd.core.series.Series)):
-    
-        raise Exception("Invalid input. Please input a (single column) pandas dataframe. You entered a: " + str(df.__class__))
-    
-    plt.style.use(fig_style)
-    plt.figure(figsize = fig_size)
-    
-    # check if input is a dataframe and loop over the columns. 
-    if isinstance(df, pd.core.frame.DataFrame):
-    
-        for column in df:
-            
-            col_fft = fft(np.array(df[column])) # we need to transform it into a numpy array, else we receive an error. 
-            n = len(col_fft)
-            maxfreq = 1/2
-            freq = np.array((range(1, n//2)))
-            freq = np.array([x / (n/2) * maxfreq for x in freq])
-            period = np.array([1 / x for x in freq]) # inverse of the frequency
-            col_fft_power =  np.abs(col_fft[0:math.floor(n/2)])**2
-            col_fft_power =  col_fft_power[1:]
-            max_power = max(col_fft_power)
-            col_fft_power_ = [number / max_power for number in col_fft_power]
-            plt.plot(period, col_fft_power_, label = column)
-            plt.scatter(period, col_fft_power_, s = 100)
-
-        plt.legend(loc = legend_loc)
-        plt.grid(False)
-        plt.xlim(x_lim)
-        plt.title(str(fig_title), fontsize=15)
-        plt.xlabel("Rounds")
-
-    if save_fig:
-        plt.savefig("Data/" + str(fig_title) + ".pdf")
-        
-def compare_homo_hetero(df_hetero, df_homo, fourier = False, fig_style = 'default',
-                       fig_size = (50, 10), fig_xlim = None, save_fig = False,
-                       fig_title = "Comparison of Homogenous and Heterogenous Populations"):
-    
-    """
-    Compares the results of the coopration ration between simulations with homogenous populations
-    and simulations with heterogenous populations. Both inputs must be pandas dataframes.
-    Make sure you input the dataframes correctly! If you want the fourier series instead of the
-    raw data, specificy this by setting fourier = True.
-    
-    """
-    
-    if not all(isinstance(i, pd.core.frame.DataFrame) for i in [df_hetero, df_homo]):
-        
-        raise Exception("Both inputs must be pandas dataframes!")
-    
-    plt.style.use(fig_style)
-    plt.figure(figsize = fig_size)
-    
-    if fourier:
-        
-        for column in df_hetero:
-            
-            col_fft = fft(df_hetero[column])
-            n = len(col_fft)
-            maxfreq = 1/2
-            freq = np.array((range(1, n//2)))
-            freq = np.array([x / (n/2) * maxfreq for x in freq])
-            period = np.array([1 / x for x in freq])
-            col_fft_power =  np.abs(col_fft[0:math.floor(n/2)])**2 
-            plt.plot(period, col_fft_power[1:], label = "Hetero " + str(column))
-            plt.scatter(period, col_fft_power[1:], label = "Hetero " + str(column))
-            
-            
-        for column in df_homo:
-
-            col_fft = fft(df_homo[column])
-            n = len(col_fft)
-            maxfreq = 1/2
-            freq = np.array((range(1, n//2)))
-            freq = np.array([x / (n/2) * maxfreq for x in freq])
-            period = np.array([1 / x for x in freq])
-            col_fft_power =  np.abs(col_fft[0:math.floor(n/2)])**2 
-            plt.plot(period, col_fft_power[1:], label = "Homo " + str(column))
-            
-    else:
-  
-        for column in df_hetero:
-
-            plt.plot(df_hetero[column], label = "Hetero " + str(column))
-
-        for column in df_homo:
-
-            plt.plot(df_homo[column], label = "Homo " + str(column))
-
-    plt.legend()
-    plt.xlim(fig_xlim)
-    plt.grid(False)
-    
-    if save_fig:
-        plt.savefig("Data/" + str(fig_title) + ".pdf")
-
-def fourier_instability(dataframe, n_peaks):
-    """
-    This functions takes as input a dataframe with the average cooperation
-    ratio and an integer. The functions calculates the i'th highest peaks
-    of the fourier and returns their sum. The results are stored in a dataframe.
-    """
-
-
-    if not isinstance(n_peaks, (list, np.ndarray)):
-        raise Exception("Please specify n in a list")
-    
-    names_df = list()
-    numbers_df = list()
-    results_df = list()
-
-    for d in dataframe:
-        
-        col_fft = fft(np.array(d))
-        n = len(col_fft)
-        maxfreq = 1/2
-        freq = np.array((range(1, n//2)))
-        freq = np.array([x / (n/2) * maxfreq for x in freq])
-        period = np.array([1 / x for x in freq])
-        col_fft_power =  np.abs(col_fft[0:math.floor(n/2)])**2 
-        col_fft_power =  col_fft_power[1:]
-        max_power = max(col_fft_power) 
-        col_fft_power = [number / max_power for number in col_fft_power]
-        lines_check = [list(i) for i in zip(period, col_fft_power)]
-
-        X = list()
-        Y = list()
-        Alpha = list()
-        result_ins = list()
-
-        for line in lines_check[3:100]:
-            alpha = 100000 / line[0] * line[1]
-            X.append(round(line[0]))
-            Y.append(round(line[1]))
-            Alpha.append(round(alpha))
-
-        data = {'X' : X, 'Y' : Y, 'Alpha' : Alpha}
-        df = pd.DataFrame(data= data)
-        df = df.sort_values(by=['Y'], ascending= False)
-        
-        for number in n_peaks:
-            res = sum(df['Alpha'][0:number])
-            names_df.append(str(d.name))
-            numbers_df.append(number)
-            results_df.append(res)
-
-    df_fin = pd.DataFrame({'Seed':names_df, 'N': numbers_df, 'sum_of_peaks': results_df})
-
-
-    return df_fin
-
-def save_tournament_csv(tournament, seed = None, type_of_file = ".csv"):
+def save_tournament_csv(tournament, seed = None, tour_type = None, type_of_file = ".csv"):
     
     """
     Takes the tournament object as input and saves
@@ -594,8 +439,9 @@ def save_tournament_csv(tournament, seed = None, type_of_file = ".csv"):
     array_dict = C_D_dict_per_round(tournament) # this takes very long
     fractions_c = [round(num_c / (num_c + num_d), 3) for num_c, num_d in zip(array_dict[C], array_dict[D])]
     fractions_c = np.array(fractions_c)
-    fractions_c = pd.DataFrame({'Seed ' + str(seed) : fractions_c})
-    fractions_c.to_csv("data/coop_ratio/data_" + str(seed) + str(type_of_file), encoding='utf-8', index = False)
+
+    fractions_c = pd.DataFrame({'seed': seed, 'coop_ratio':fractions_c, 'tournament_type':tour_type})
+    fractions_c.to_csv("data/coop_ratio/data_" + str(seed)  + str(type_of_file), encoding='utf-8', index = False)
     
 def get_rewards(population, payoff_functions, distance_function):
     """
@@ -658,7 +504,6 @@ def get_mean_suckers(population, payoff_functions, distance_function):
     df = get_suckers(population, payoff_functions, distance_function)
     return df.mean()  
 
-
 def get_sd_rewards(population, payoff_functions, distance_function):
     """
     calculate the standard deviation
@@ -672,7 +517,6 @@ def get_sd_temptations(population, payoff_functions, distance_function):
     """ 
     df = get_temptations(population, payoff_functions, distance_function)
     return df.std()    
-
 
 def get_sd_punishments(population, payoff_functions, distance_function):
     """
