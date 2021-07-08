@@ -12,6 +12,32 @@ from .enums import Action, C, D
 from .tournament import Tournament
 from statistics import mean, stdev
 from functools import lru_cache
+from pathlib import Path
+
+
+def save_results(tournament, seed):
+    """
+    This function saves in a csv format the following results: the number of strategies in a population per round; 
+    the number of unique outcomes (cooperation/defection/exploitation) per round; the number of payoffs (T/R/P/S) received
+    by each agent over the course of the entire tournament. 
+    """
+
+    Path("results/").mkdir(exist_ok=True)
+
+    num_strategies_per_round = pd.DataFrame(tournament.strategy_evolution)
+    num_strategies_per_round.columns = [col_name.name for col_name in num_strategies_per_round.columns]
+    num_strategies_per_round.to_csv("results/seed_" + str(seed) + "_num_strategies_per_round.csv")
+
+    distributions_outcomes = outcomes_dict_per_round(tournament)
+    pd.DataFrame(distributions_outcomes).to_csv("results/seed_" + str(seed) + "_num_outcomes_per_round.csv")
+
+    agents = pd.DataFrame([[c.name, c.m, c.d, c.r, c.w] for c in list(tournament.graph.nodes)], columns=['name', 'm', 'd', 'r', 'w']).set_index('name')
+    outcomes_dict = get_outcomes(tournament, agents)
+    outcomes_df = pd.DataFrame(outcomes_dict)
+    df_combined = pd.concat([agents, outcomes_df.T], axis=1)
+    df_combined.to_csv("results/seed_" + str(seed) + "_payoffs_per_agent.csv")
+
+    print("Tournament saved.")
 
 def get_game_data(graph, c1, c2, OUTCOME):
     outcome ={'R':'RR', 'P':'PP', 'T':'TS', 'S':'ST'}[OUTCOME]

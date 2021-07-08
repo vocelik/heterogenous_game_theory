@@ -21,7 +21,7 @@ def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []
         M = [5 for i in range(number_of_agents)]
         D = [0.4 for i in range(number_of_agents)]
         R = [0.3 for i in range(number_of_agents)]
-        W = [1 for i in range(number_of_agents)]
+        W = [0 for i in range(number_of_agents)]
 
         data = { "Agents": agents_test, "M" : M, "D" : D, "R" : R, "W": W} 
         df = pd.DataFrame.from_dict(data)
@@ -44,7 +44,7 @@ def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = []
         M = [np.random.choice(samples_ints_m) for i in range(number_of_agents)]
     else:
         # if the distribution does not follow a power law, we take a truncated normal distribution
-        M_trunc = get_truncated_normal(mean=M[0], sd = M[1], low = 0, upp = 10)
+        M_trunc = get_truncated_normal(mean=M[0], sd = M[1], low = 0.1, upp = 10)
         M = [round(np.random.choice([i for i in M_trunc.rvs(1000)]), 1) for i in range(number_of_agents)]
         
     # we repeat this for the other variables 

@@ -13,7 +13,7 @@ class Agent:
         self.m = m # mass
         self.d = d  # dependence
         self.r = r # rivalry
-        self.w = w # weight
+        self.w = w # weigh
         self.self_reward = None
         
         # State variables, not yet initialized since that will be done in the tournament

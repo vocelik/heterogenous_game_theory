@@ -84,10 +84,10 @@ class Tournament:
                   payoff_functions['T'](c2,c1))
             
             # check if condition T > R > P > S is satisfied.
-            assert RR[0] < TS[0], f'temptation was not greater than reward for agent-combination {c1.name} and {c2.name}. Reward is {RR[0]} and Temptation is {TS[0]}'
-            assert RR[1] < ST[1], f'temptation was not greater than reward for agent-combination {c1.name} and {c2.name}. Reward is {RR[1]} and Temptation is {ST[1]}'
-            assert ST[0] < PP[0], f'punishment was not greater than sucker for agent-combination {c1.name} and {c2.name}. Sucker is {ST[0]} and Punishment is {PP[0]} '
-            assert TS[1] < PP[1], f'punishment was not greater than sucker for agent-combination {c1.name} and {c2.name}. Sucker is {TS[1]} and Punishment is {PP[1]}'
+            assert RR[0] <= TS[0], f'temptation was not greater than reward for agent-combination {c1.name} and {c2.name}. Reward is {RR[0]} and Temptation is {TS[0]}'
+            assert RR[1] <= ST[1], f'temptation was not greater than reward for agent-combination {c1.name} and {c2.name}. Reward is {RR[1]} and Temptation is {ST[1]}'
+            assert ST[0] <= PP[0], f'punishment was not greater than sucker for agent-combination {c1.name} and {c2.name}. Sucker is {ST[0]} and Punishment is {PP[0]} '
+            assert TS[1] <= PP[1], f'punishment was not greater than sucker for agent-combination {c1.name} and {c2.name}. Sucker is {TS[1]} and Punishment is {PP[1]}'
             
             # initialize all edges
             graph.add_edge(
