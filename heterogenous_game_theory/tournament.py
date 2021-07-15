@@ -304,7 +304,7 @@ class Tournament:
         
         return Δfitness_1, Δfitness_2, outcome
         
-    def play(self, self_reward, playing_each_other, nr_strategy_changes, mutation_rate):
+    def play(self, self_reward, playing_each_other, nr_strategy_changes, mutation_rate, reset_fitness):
 
         """
         parameters:
@@ -360,6 +360,10 @@ class Tournament:
             for _ in range(nr_strategy_changes):
                 # change {nr_strategy_changes} strategies
                 losing_agent, winning_strategy = self.change_a_strategy(mutation_rate, self.round)
+
+                if reset_fitness:
+                    losing_agent.reset_fitness()
+
                 self.winning_strategies.append(winning_strategy)
                 
             # update fitness_histories
@@ -403,7 +407,8 @@ class Tournament:
                  nr_strategy_changes = 1,
                  mutation_rate =0.1,
                  init_fitnes_as_m=False,
-                 noise = 0.1
+                 noise = 0.1,
+                 reset_fitness = False
                  ):
         """
         Create a tournament, initialize al the variables of the agents and
@@ -421,7 +426,7 @@ class Tournament:
             - playing_each_other: bool, if agents should play prisoners delemma's with each other, set to false to create a control-group
             - nr_strategy_changes: int, number of strategy changes after eacht round
             - mutation_rate: probability that a strategy change is random
-            - init_fitnes_as_m: bool, if agents start with self.fitness==self.m or self.fitness==0
+            - init_fitnes_as_m: bool, if agen   ts start with self.fitness==self.m or self.fitness==0
         
         returns:
             the tournament object, with data from the simulation inside the
@@ -443,6 +448,6 @@ class Tournament:
         tournament.init_strategies()
         tournament.init_fitness(init_fitnes_as_m=init_fitnes_as_m)
         
-        tournament.play(self_reward, playing_each_other, nr_strategy_changes, mutation_rate)
+        tournament.play(self_reward, playing_each_other, nr_strategy_changes, mutation_rate, reset_fitness)
         
         return tournament    

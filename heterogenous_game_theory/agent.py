@@ -58,3 +58,10 @@ class Agent:
             - current strategy
         """
         return self._strategy
+
+    def reset_fitness(self):
+        """
+        resets the fitness of an agent
+        """
+
+        self.fitness = 0
