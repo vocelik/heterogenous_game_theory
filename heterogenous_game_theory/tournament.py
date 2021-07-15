@@ -426,7 +426,7 @@ class Tournament:
             - playing_each_other: bool, if agents should play prisoners delemma's with each other, set to false to create a control-group
             - nr_strategy_changes: int, number of strategy changes after eacht round
             - mutation_rate: probability that a strategy change is random
-            - init_fitnes_as_m: bool, if agen   ts start with self.fitness==self.m or self.fitness==0
+            - init_fitnes_as_m: bool, if agents start with self.fitness==self.m or self.fitness==0
         
         returns:
             the tournament object, with data from the simulation inside the
