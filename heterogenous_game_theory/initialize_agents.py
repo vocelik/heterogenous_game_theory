@@ -2,85 +2,87 @@ import pandas as pd
 import numpy as np
 import scipy as sp
 from .agent import Agent
+from .payoff_functions import game_types
 from scipy.stats import truncnorm
 from itertools import combinations
 import matplotlib.pyplot as plt
 
-def get_agents(homogenous = True, number_of_agents = 100, M = [], D = [], R = [], W = []):
+def get_agents(number_of_agents = 100, game_type = None, Weight = [1, 1/10000]):
 
     """
     This function creates a set of agents of size number_of_agents. To allow for maxmimum customization,
     meaning that each characteric of the agent can follow a unique distribution, the user must specify
     if the distribution of an element should follow a power-law by making the first element of M, D, and/or R
-    'power'. Otherwise, the element will follow a normal distribution. 
+    'power'. Otherwise, the element will follow a normal distribution. Custom specifications can be added to the
+    game_types dictionary. 
     """
+    # check if game type has been specified, otherwise return false.
+    if not game_type:
+        print("Please specify game type.", "Choose from the following: ")
+        for key, value in game_types.items():
+            print(key)
+        print("Or create your own.")
 
-    if homogenous:
-        # if homogenous we create four columns with default values
-        agents_test = ["Agent " + str(i) for i in range(number_of_agents)]
-        M = [5 for i in range(number_of_agents)]
-        D = [0.4 for i in range(number_of_agents)]
-        R = [0.3 for i in range(number_of_agents)]
-        W = [0 for i in range(number_of_agents)]
+        return False
+    
+    # check if game type exists in dictionary, otherwise return false.
+    if game_type not in game_types.keys():
+        print("This game type is not included. Please append it to the game_types dictionary and try again.")
+        return False
 
-        data = { "Agents": agents_test, "M" : M, "D" : D, "R" : R, "W": W} 
-        df = pd.DataFrame.from_dict(data)
-        
-        agents = []
+    # retrieve the three values that characterize the agents.
+    Mass = game_types[game_type]['M']
+    Dependence = game_types[game_type]['D']
+    Rivalry = game_types[game_type]['R']
 
-        for name in df.index:
-            agent = Agent(name, df['M'].at[name], df['D'].at[name], df['R'].at[name],df['W'].at[name] )
-            agents.append(agent)
-        
-        return agents
-
-    # if not homogenous we need to take into account different combinations of distributions. 
-    if M[0] == "power":
-        x_m, alpha_m = M[1], M[2]
-        # from numpy documentation: The classical Pareto distribution can be obtained from the Lomax distribution by adding 1 and multiplying by the scale parameter m.
-        samples_m = (np.random.pareto(alpha_m, 100000) + 1) * x_m
-        samples_ints_m = [round(i,1) for i in samples_m]
-        samples_ints_m = [i for i in samples_ints_m if i <= 10]
-        M = [np.random.choice(samples_ints_m) for i in range(number_of_agents)]
+    # check if distribution is a pareto and create agents, otherwise create
+    # agents based on normal distributions with mean and s.d..
+    if Mass[0] == "power":
+        x_m, alpha_m = Mass[1], Mass[2]
+        # numpy documentation: The classical Pareto distribution can be obtained
+        # from the Lomax distribution by adding 1 and multiplying by the scale parameter m.
+        pareto_distribution = (np.random.pareto(alpha_m, 100000) + 1) * x_m
+        pareto_sample = [round(i,1) for i in pareto_distribution]
+        pareto_sample_truncated = [i for i in pareto_sample if i <= 10]
+        M = [np.random.choice(pareto_sample_truncated) for i in range(number_of_agents)]
     else:
         # if the distribution does not follow a power law, we take a truncated normal distribution
-        M_trunc = get_truncated_normal(mean=M[0], sd = M[1], low = 0.1, upp = 10)
+        M_trunc = get_truncated_normal(mean=Mass[0], sd = Mass[1], low = 0.1, upp = 10)
         M = [round(np.random.choice([i for i in M_trunc.rvs(1000)]), 1) for i in range(number_of_agents)]
         
     # we repeat this for the other variables 
-    if D[0] == "power":
-        x_d, alpha_d = D[1], D[2]
-        samples_d = (np.random.pareto(alpha_d, 100000) + 1) * x_d
-        samples_ints_d = [round(i,2) for i in samples_d]
-        samples_ints_d = [i for i in samples_ints_d if i <= 1]
-        D = [np.random.choice(samples_ints_d) for i in range(number_of_agents)]
+    if Dependence[0] == "power":
+        x_d, alpha_d = Dependence[1], Dependence[2]
+        pareto_distribution = (np.random.pareto(alpha_d, 100000) + 1) * x_d
+        pareto_sample = [round(i,2) for i in pareto_distribution]
+        pareto_sample_truncated = [i for i in pareto_sample if i <= 1]
+        D = [np.random.choice(pareto_sample_truncated) for i in range(number_of_agents)]
     else:
-        D_trunc = get_truncated_normal(mean=D[0], sd = D[1], low = 0.01, upp = 1)
+        D_trunc = get_truncated_normal(mean=Dependence[0], sd = Dependence[1], low = 0.01, upp = 1)
         D = [round(np.random.choice([i for i in D_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
     
-    if R[0] == "power":
-        x_r, alpha_r = R[1], R[2]
-        samples_r = (np.random.pareto(alpha_r, 100000) + 1) * x_r
-        samples_ints_r = [round(i,2) for i in samples_r]
-        samples_ints_r = [i for i in samples_ints_r if i <= 1]
-        R = [np.random.choice(samples_ints_r) for i in range(number_of_agents)]
+    if Rivalry[0] == "power":
+        x_r, alpha_r = Rivalry[1], Rivalry[2]
+        pareto_distribution = (np.random.pareto(alpha_r, 100000) + 1) * x_r
+        pareto_sample = [round(i,2) for i in pareto_distribution]
+        pareto_sample_truncated = [i for i in pareto_sample if i <= 1]
+        R = [np.random.choice(pareto_sample_truncated) for i in range(number_of_agents)]
     else:
-        R_trunc = get_truncated_normal(mean=R[0], sd = R[1], low = 0.01, upp = 1)
+        R_trunc = get_truncated_normal(mean=Rivalry[0], sd = Rivalry[1], low = 0.01, upp = 1)
         R = [round(np.random.choice([i for i in R_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
 
-
-    if W[0] == "power":
-        x_r, alpha_r = W[1], W[2]
-        samples_r = (np.random.pareto(alpha_r, 100000) + 1) * x_r
-        samples_ints_r = [round(i,2) for i in samples_r]
-        samples_ints_r = [i for i in samples_ints_r if i <= 1]
-        W = [np.random.choice(samples_ints_r) for i in range(number_of_agents)]
+    if Weight[0] == "power":
+        x_r, alpha_r = Weight[1], Weight[2]
+        pareto_distribution = (np.random.pareto(alpha_r, 100000) + 1) * x_r
+        pareto_sample = [round(i,2) for i in pareto_distribution]
+        pareto_sample_truncated = [i for i in pareto_sample if i <= 1]
+        W = [np.random.choice(pareto_sample_truncated) for i in range(number_of_agents)]
     else:
-        W_trunc = get_truncated_normal(mean=W[0], sd = W[1], low = 0, upp = 1)
+        W_trunc = get_truncated_normal(mean=Weight[0], sd = Weight[1], low = 0, upp = 1)
         W = [round(np.random.choice([i for i in W_trunc.rvs(1000)]), 2) for i in range(number_of_agents)]
 
-    agents_test = ["Agent " + str(i) for i in range(number_of_agents)]
-    data = {"Agents": agents_test, "M" : M, "D" : D, "R" : R, "W" : W}
+    agents_index = ["Agent " + str(i) for i in range(number_of_agents)]
+    data = {"Agents": agents_index, "M" : M, "D" : D, "R" : R, "W" : W}
     df = pd.DataFrame.from_dict(data)
 
     # now we create the agent objects

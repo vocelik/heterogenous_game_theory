@@ -208,10 +208,10 @@ class Tournament:
         that is entirely random.
         
         parameters:
-            - mutation_rate: probabilitie of a random strategy change
+            - mutation_rate: probability of a random strategy change.
             
         side effect:
-            - changes a agents strategy
+            - changes an agents strategy.
             
         """
         

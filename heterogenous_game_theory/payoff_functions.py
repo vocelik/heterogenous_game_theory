@@ -1,5 +1,3 @@
-import math as m
-
 # These functions are the suggested payoff_functions. That is, they 
 # calculate how much fitness a agent should  get/lose by
 # playing a prisoners dilemma with another agent. They are
@@ -40,3 +38,34 @@ traditional_payoff_functions = {
         'S': lambda *args: 0,
         'P': lambda *args: 1
         }
+
+game_types = {
+    
+    "norm_mdr_max": {'M': [5, 12.5],
+                        'D': [0.4, 1.25],
+                        'R': [0.3, 1.25]},
+    
+    "norm_dr_max": {'M': [5, 1/10000],
+                       'D': [0.4, 1.25],
+                       'R': [0.3, 1.25]},
+    
+    "norm_m_max": {'M': [5, 12.5],
+                   'D': [0.4, 1/10000],
+                   'R': [0.3, 1/10000]},
+    
+    "pareto_mdr_max": {'M': ["power", 2.5, 1],
+                       'D': ["power", 0.15, 1],
+                       'R': ["power", 0.2, 1]},
+    
+    "pareto_dr_max": {'M': [5, 1/10000],
+                      'D': ["power", 0.15, 1],
+                      'R': ["power", 0.2, 1]},
+    
+    "pareto_m_max": {'M': ["power", 2.5, 1],
+                     'D': [0.4, 1/10000],
+                     'R': [0.3, 1/10000]},
+    
+    "homogenous": {'M': [5, 1/10000],
+                   'D': [0.4, 1/10000],
+                   'R': [0.3, 1/10000]}
+}

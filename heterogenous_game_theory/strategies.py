@@ -57,6 +57,8 @@ def APavlov(selfmoves, othermoves):
     # one of five categories according to its responses and
     # plays an optimal strategy for each.
 
+    # it does not work yet because strategies are not defined as classes.
+
     opponent_class = None
 
     if selfmoves == []:
