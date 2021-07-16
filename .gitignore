@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 .ipynb_checkpoints/
+.DS_Store
 data/
 data_analysis/
 testing_folder/
