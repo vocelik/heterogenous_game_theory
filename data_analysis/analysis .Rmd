@@ -1,0 +1,59 @@
+---
+title: "EGT - Data Analysis"
+author: "Václav Ocelík"
+date: "7/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+libraries
+```{r}
+setwd("/Users/vavaocel/Documents/projects/heterogenous_game_theory/data_analysis/")
+library(tidyverse)
+```
+
+import data
+```{r}
+control_group_num_outcomes <- do.call(rbind, lapply(Sys.glob("../simulations 2021-/control_groups/results/*_num_outcomes_per_round.csv"), read_csv)) %>%
+    mutate(seed = rep(c(2,4,8,16,32,64,128,256,512,1024), each = 10000))
+
+
+norm_mdr_max_num_outcomes <- do.call(rbind, lapply(Sys.glob("../simulations 2021-/normal_distributions/norm_mdr_max/results/*_num_outcomes_per_round.csv"), read_csv))  %>%
+    mutate(seed = rep(c(2,4,8,16,32,64,128,256,512,1024), each = 10000))
+
+```
+
+
+mutual cooperation
+```{r}
+norm_mdr_max_num_outcomes %>%
+    ggplot() +
+    geom_line(aes(X1, Mutual_Cooperation), color = "red") +
+    facet_wrap(~seed)
+
+control_group_num_outcomes %>%
+    ggplot() +
+    geom_line(aes(X1, Mutual_Cooperation), color = "red") +
+    facet_wrap(~seed)
+```
+
+defection
+```{r}
+norm_mdr_max_num_outcomes %>%
+    ggplot() +
+    geom_line(aes(X1, Mutual_Defection), color = "red") +
+    facet_wrap(~seed)
+
+control_group_num_outcomes %>%
+    ggplot() +
+    geom_line(aes(X1, Mutual_Defection), color = "red") +
+    facet_wrap(~seed)
+```
+
+
+
+
+
