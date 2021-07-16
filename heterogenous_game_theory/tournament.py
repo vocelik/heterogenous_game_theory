@@ -227,7 +227,7 @@ class Tournament:
         # select a winning strategy
         mutation = bool(np.random.binomial(1, mutation_rate))
         if mutation:
-            # in stead of changing a strategy according to the rules of the simmulation
+            # instead of changing a strategy according to the rules of the simulation
             # we sometimes have a random mutation
             winning_strategy = np.random.choice(self.strategy_list)
             winning_agent = 'random_mutation'
@@ -243,7 +243,7 @@ class Tournament:
             winning_agent = agent_list[reproduce_idx]
             winning_strategy = winning_agent.get_current_strategy()
         
-        # actually CHANGE the strategy
+        # now we change the strategy of the losing agent
         losing_agent.change_strategy(round_num, winning_strategy)
         
         # for logging
@@ -316,6 +316,7 @@ class Tournament:
               other, and get/lose fitness from this
             - nr_strategy_changes: int, number of strategy-changes that occura
               after each round
+            - reset_fitness: bool, if an agent's fitness is reset after losing in a round.
               
         example:
             >>> tournament = Tournament(XXX)
@@ -325,13 +326,13 @@ class Tournament:
         """
         if self.is_done:
             print("WARNING: you are playing a tournament that has already been played. This will accumulate more"\
-                  "data in the graph, which is probably incorrect. You probably want to re-initalize the tournament and"\
+                  "data in the graph, which is probably incorrect. You may want to re-initalize the tournament and"\
                   "agents, or refresh the kernel")
         
         strategies_initialized = self.check_strategies_initialized()
 
         if not strategies_initialized:
-            print(f'All agents mus have initialized strategies, this can be done using the init_strategies method')
+            print(f'All agents must have initialized strategies, this can be done using the init_strategies method')
             return False
 
 
