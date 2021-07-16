@@ -59,31 +59,40 @@ def APavlov(selfmoves, othermoves):
 
     opponent_class = None
 
-    if len(selfmoves) < 1:
-        print("THIS WORKS")
+    if selfmoves == []:
         return C
     # first six rounds TFT
     if len(selfmoves) < 6:
         return D if othermoves[-1] == D else C
     # after six rounds move on to classification
-    if len(selfmoves) > 6:
+    if len(selfmoves) % 6 == 0:
         # classify opponent
-        if othermoves[-6:] == [D] * 6:
+        if othermoves[-6:] == [C] * 6:
             opponent_class = "COOP"
+            print("COOP")
+            print(othermoves[-6:])
         if othermoves[-6:].count(D) >= 4:
             opponent_class = "ALLD"
+            print("ALLD")
+            print(othermoves[-6:])
         if othermoves[-6:].count(D) == 3:
             opponent_class = "STFT"
+            print("STFT")
+            print(othermoves[-6:])
         if not opponent_class:
-            opponent_class = "Random"
+            opponent_class = "RANDOM"
+            print("RANDOM")
+            print(othermoves[-6:])
     # play according to classification
-    if opponent_class in ["Random", "ALLD"]:
+    if opponent_class in ["RANDOM", "ALLD"]:
         return D
     if opponent_class == "STFT":
         # TFTT
         return D if othermoves[-2:] == [D, D] else C
-    if opponent_class == "Cooperative":
+    if opponent_class == "COOP":
         # TFT
-        return D if othermoves[-1:] == [D] else C  
+        return D if othermoves[-1] == [D] else C  
 
-    APavlov.name = 'Adaptive Pavlov'
+    print("nothing was returned")
+
+APavlov.name = 'Adaptive Pavlov'

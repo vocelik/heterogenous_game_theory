@@ -266,7 +266,7 @@ class Tournament:
     def play_prisoners_dilema(self, agent_1, agent_2, game):
         """
         parameters:
-            - coutry_1, agent_2: agent
+            - agent_1, agent_2: agent
             - game: dict, data associated with the game between agent_1 and agent_2 
             
         side effects:
