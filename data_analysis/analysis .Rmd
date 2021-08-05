@@ -21,15 +21,15 @@ control_group_num_outcomes <- do.call(rbind, lapply(Sys.glob("../simulations 202
     mutate(seed = rep(c(2,4,8,16,32,64,128,256,512,1024), each = 10000))
 
 
-norm_mdr_max_num_outcomes <- do.call(rbind, lapply(Sys.glob("../simulations 2021-/normal_distributions/norm_mdr_max/results/*_num_outcomes_per_round.csv"), read_csv))  %>%
-    mutate(seed = rep(c(2,4,8,16,32,64,128,256,512,1024), each = 10000))
+norm_m_max_num_outcomes <- do.call(rbind, lapply(Sys.glob("../simulations 2021-/normal_distributions/norm_m_max/results/*_num_outcomes_per_round.csv"), read_csv))  %>%
+    mutate(seed = rep(c(2,4,8,16,32,64,128,256,512), each = 10000))
 
 ```
 
 
 mutual cooperation
 ```{r}
-norm_mdr_max_num_outcomes %>%
+norm_m_max_num_outcomes %>%
     ggplot() +
     geom_line(aes(X1, Mutual_Cooperation), color = "red") +
     facet_wrap(~seed)
@@ -50,6 +50,19 @@ norm_mdr_max_num_outcomes %>%
 control_group_num_outcomes %>%
     ggplot() +
     geom_line(aes(X1, Mutual_Defection), color = "red") +
+    facet_wrap(~seed)
+```
+
+exploitation
+```{r}
+norm_m_max_num_outcomes %>%
+    ggplot() +
+    geom_line(aes(X1, Exploitation), color = "red") +
+    facet_wrap(~seed)
+
+control_group_num_outcomes %>%
+    ggplot() +
+    geom_line(aes(X1, Exploitation), color = "red") +
     facet_wrap(~seed)
 ```
 
